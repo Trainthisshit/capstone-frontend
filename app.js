@@ -386,7 +386,7 @@ async function handleTeamDetailsForm(event) {
     
     currentTeam = {
     team_id: `team-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    name: teamName,  
+    name: teamName,  // This matches your database
     leader: teamLeader,
     members: members
 };
