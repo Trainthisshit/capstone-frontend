@@ -80,29 +80,7 @@ async function fetchMentors() {
         const response = await fetch(`${API_BASE_URL}/api/mentors`);
         const data = await response.json();
         return data.mentors;
-    } catch (error) {
-        console.error('Error fetching mentors:', error);
-        // Fallback to hardcoded mentors if API fails
-        return [
-            { username: 'mentor1', name: 'Jyoti Khurpude' },
-            { username: 'mentor2', name: 'Sanjivani Kulkarni' },
-            { username: 'mentor3', name: 'Mrunal Fatangare' },
-            { username: 'mentor4', name: 'Hemlata Ohal' },
-            { username: 'mentor5', name: 'Farahhdeeba Shaikh' },
-            { username: 'mentor6', name: 'Prerana Patil' },
-            { username: 'mentor7', name: 'Yogesh Patil' },
-            { username: 'mentor8', name: 'Vilas Rathod' },
-            { username: 'mentor9', name: 'Pradeep Paygude' },
-            { username: 'mentor10', name: 'Kajal Chavan' },
-            { username: 'mentor11', name: 'Megha Dhotey' },
-            { username: 'mentor12', name: 'Pallavi Nehete' },
-            { username: 'mentor13', name: 'Nita Dongre' },
-            { username: 'mentor14', name: 'Mrunal Aware' },
-            { username: 'mentor15', name: 'Shilpa Shitole' },
-            { username: 'mentor16', name: 'Vaishali Langote' },
-            { username: 'mentor17', name: 'Sulkshana Malwade' }
-        ];
-    }
+    } 
 }
 
 // Populate mentor dropdowns
