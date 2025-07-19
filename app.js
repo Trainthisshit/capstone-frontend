@@ -56,7 +56,7 @@ async function getTeams() {
 }
 
 
-const API_BASE_URL = 'https://your-actual-render-app-name.onrender.com';
+const API_BASE_URL = 'https://capstone-backend-mgis.onrender.com';
 
 async function authenticateAdmin(username, password) {
     try {
