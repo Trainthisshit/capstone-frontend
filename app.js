@@ -385,11 +385,11 @@ async function handleTeamDetailsForm(event) {
     }
     
     currentTeam = {
-        team_id: `team-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        name: teamName,
-        leader: teamLeader,
-        members: members
-    };
+    team_id: `team-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    team_name: teamName,  
+    leader: teamLeader,
+    members: members
+};
     
     showPage('mentor-selection');
     return false;
