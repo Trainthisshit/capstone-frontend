@@ -76,11 +76,10 @@ async function authenticateAdmin(username, password) {
 }
 // Fetch mentors from backend
 async function fetchMentors() {
-    try {
         const response = await fetch(`${API_BASE_URL}/api/mentors`);
         const data = await response.json();
         return data.mentors;
-    } 
+
 }
 
 // Populate mentor dropdowns
