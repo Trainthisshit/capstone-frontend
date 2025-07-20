@@ -2496,3 +2496,28 @@ textarea.form-control {
     color: inherit !important;
     -webkit-text-fill-color: inherit !important;
 }
+
+
+/* URGENT FIX: Ensure text visibility */
+.welcome-title, 
+.welcome-container h2, 
+.welcome-container p {
+    position: relative !important;
+    z-index: 10 !important;
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
+    background-clip: unset !important;
+    -webkit-background-clip: unset !important;
+}
+
+/* Fix title specifically */
+.welcome-title {
+    color: #3b82f6 !important;
+    text-shadow: 0 2px 10px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Ensure buttons are visible */
+.welcome-options .btn {
+    position: relative !important;
+    z-index: 15 !important;
+}
