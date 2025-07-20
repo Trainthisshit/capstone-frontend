@@ -247,38 +247,26 @@ async function populateMentorDropdowns() {
 
 // Add showPage function if missing
 function showPage(pageId) {
-    console.log('Showing page:', pageId);
-    
     // Hide all pages
-    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
     
-    // Show the target page
+    // Show target page
     const targetPage = document.getElementById(pageId);
     if (targetPage) {
         targetPage.classList.add('active');
-        console.log('Page shown successfully:', pageId);
+        
+        // Initialize VFX only for welcome page
+        if (pageId === 'welcome') {
+            vfxInitialized = false; // CHANGE: Reset this to allow re-animation
+            setTimeout(initializeProfessionalVFX, 300);
+        }
     } else {
-        console.error('Page not found:', pageId);
-    }
-    
-    // Handle specific page initialization
-    if (pageId === 'view-teams') {
-        setTimeout(async () => {
-            console.log('Loading view teams...');
-            await displayTeams();
-            await displayRemainingStudents();
-        }, 100);
-    } else if (pageId === 'team-management') {
-        setTimeout(async () => {
-            console.log('Loading team management...');
-            await displayTeamsManagement();
-        }, 100);
-    } else if (pageId === 'mentor-panel') {
-        setTimeout(() => {
-            initializeMentorPanel();
-        }, 100);
+        console.error(`Page with ID "${pageId}" not found`);
     }
 }
+
 async function displayTeams() {
     try {
         console.log('Fetching teams for display...');
@@ -1657,13 +1645,41 @@ function cancelAddMember() {
 // ====== PROFESSIONAL VFX INITIALIZATION ====== 
 
 function initializeProfessionalVFX() {
-  if (vfxInitialized) return;
-  vfxInitialized = true;
-  
-  createCodeParticles();
-  createNeuralNetwork();
-  createMatrixRain();
-  initializeGlitchEffect();
+    if (vfxInitialized) return;
+    vfxInitialized = true;
+    
+    setTimeout(() => {
+        initializeLetterAnimation(); // ADD this line
+        createCodeParticles();
+        createNeuralNetwork();
+        createMatrixRain();
+    }, 100);
+}
+
+function initializeLetterAnimation() {
+    const titleElement = document.querySelector('.welcome-title .cs-engineering-glitch');
+    if (!titleElement) return;
+    
+    const text = titleElement.textContent;
+    titleElement.innerHTML = '';
+    
+    Array.from(text).forEach((char, index) => {
+        const span = document.createElement('span');
+        span.textContent = char === ' ' ? '\u00A0' : char;
+        span.className = 'letter-animate';
+        
+        const randomX = (Math.random() - 0.5) * 800;
+        const randomY = (Math.random() - 0.5) * 600;
+        const randomRotate = (Math.random() - 0.5) * 720;
+        const delay = index * 0.1;
+        
+        span.style.setProperty('--start-x', `${randomX}px`);
+        span.style.setProperty('--start-y', `${randomY}px`);
+        span.style.setProperty('--start-rotate', `${randomRotate}deg`);
+        span.style.setProperty('--delay', `${delay}s`);
+        
+        titleElement.appendChild(span);
+    });
 }
 
 function createCodeParticles() {
@@ -1796,19 +1812,7 @@ function createMatrixRain() {
   setTimeout(createMatrixRain, 15000);
 }
 
-function initializeGlitchEffect() {
-  const glitchElement = document.querySelector('.cs-engineering-glitch');
-  if (!glitchElement) return;
-  
-  setInterval(() => {
-    if (document.getElementById('welcome').classList.contains('active') && Math.random() < 0.1) {
-      glitchElement.style.animation = 'none';
-      setTimeout(() => {
-        glitchElement.style.animation = 'glitch 0.3s';
-      }, 10);
-    }
-  }, 3000);
-}
+
 
 // Update your existing showPage function to initialize VFX
 const originalShowPage = showPage;
