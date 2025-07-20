@@ -2315,4 +2315,286 @@ textarea.form-control {
         max-width: 280px;
     }
 }
+/* ====== ENHANCED CAPSTONE LOGO WITH ALL EFFECTS COMBINED ====== */
+
+/* Welcome Page Layout with Image */
+.welcome-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 80vh;
+}
+
+.welcome-text {
+    flex: 1;
+    max-width: 600px;
+}
+
+.welcome-text h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.welcome-text h2 {
+    font-size: 1.5rem;
+    color: var(--color-text-secondary, #64748b);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.welcome-text p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary, #94a3b8);
+    margin-bottom: 2rem;
+}
+
+/* Enhanced Logo Container with All Effects */
+.welcome-logo {
+    position: relative;
+    flex-shrink: 0;
+    max-width: 400px;
+    perspective: 1000px;
+    overflow: hidden;
+    border-radius: 15px;
+}
+
+/* Animated Glowing Border Effect */
+.welcome-logo::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4, #10b981, #3b82f6);
+    background-size: 400% 400%;
+    border-radius: 18px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    animation: gradientShift 3s ease-in-out infinite;
+}
+
+.welcome-logo:hover::before {
+    opacity: 0.8;
+}
+
+@keyframes gradientShift {
+    0%, 100% { 
+        background-position: 0% 50%; 
+        filter: hue-rotate(0deg);
+    }
+    25% { 
+        background-position: 100% 50%; 
+        filter: hue-rotate(90deg);
+    }
+    50% { 
+        background-position: 50% 100%; 
+        filter: hue-rotate(180deg);
+    }
+    75% { 
+        background-position: 50% 0%; 
+        filter: hue-rotate(270deg);
+    }
+}
+
+/* Light Sweep Effect */
+.welcome-logo::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.6),
+        transparent
+    );
+    border-radius: 12px;
+    transition: left 0.8s ease;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.welcome-logo:hover::after {
+    left: 100%;
+    opacity: 1;
+}
+
+/* Main Logo Image with All Combined Effects */
+.welcome-logo img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: auto;
+    max-width: 350px;
+    border-radius: 12px;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: 
+        gentleFloat 6s ease-in-out infinite,
+        subtleGlow 4s ease-in-out infinite alternate;
+    filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.15));
+    transform-style: preserve-3d;
+}
+
+/* Floating Animation */
+@keyframes gentleFloat {
+    0%, 100% { 
+        transform: translateY(0px) rotate(0deg);
+    }
+    25% { 
+        transform: translateY(-12px) rotate(1deg);
+    }
+    50% { 
+        transform: translateY(-18px) rotate(0deg);
+    }
+    75% { 
+        transform: translateY(-8px) rotate(-1deg);
+    }
+}
+
+/* Subtle Glow Animation */
+@keyframes subtleGlow {
+    from {
+        filter: 
+            drop-shadow(0 10px 25px rgba(0, 0, 0, 0.15))
+            drop-shadow(0 0 15px rgba(59, 130, 246, 0.1));
+    }
+    to {
+        filter: 
+            drop-shadow(0 15px 35px rgba(0, 0, 0, 0.2))
+            drop-shadow(0 0 25px rgba(59, 130, 246, 0.3));
+    }
+}
+
+/* Spectacular Hover Effect Combining All Elements */
+.welcome-logo:hover img {
+    transform: 
+        translateY(-15px) 
+        scale(1.08) 
+        rotateY(8deg) 
+        rotateX(3deg);
+    filter: 
+        drop-shadow(0 25px 50px rgba(0, 0, 0, 0.3))
+        drop-shadow(0 0 40px rgba(59, 130, 246, 0.4))
+        brightness(1.15)
+        saturate(1.3)
+        contrast(1.1);
+    animation-play-state: paused; /* Pause float animation on hover */
+}
+
+/* Pulse Effect for Extra Attraction */
+.welcome-logo:hover {
+    animation: logoContainer 0.6s ease-in-out;
+}
+
+@keyframes logoContainer {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+/* Additional Sparkle Effect */
+.welcome-logo:active img {
+    transform: 
+        translateY(-10px) 
+        scale(0.95) 
+        rotateY(0deg) 
+        rotateX(0deg);
+    transition: all 0.1s ease-out;
+}
+
+/* Mobile Responsive Optimizations */
+@media (max-width: 768px) {
+    .welcome-flex {
+        flex-direction: column;
+        text-align: center;
+        gap: 2rem;
+        padding: 1rem;
+    }
+    
+    .welcome-text h1 {
+        font-size: 2rem;
+    }
+    
+    .welcome-text h2 {
+        font-size: 1.2rem;
+    }
+    
+    .welcome-logo {
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    
+    .welcome-logo img {
+        max-width: 280px;
+        animation-duration: 8s; /* Slower animation on mobile */
+    }
+    
+    .welcome-logo:hover img {
+        transform: translateY(-8px) scale(1.05); /* Reduced effect on mobile */
+        filter: 
+            drop-shadow(0 15px 30px rgba(0, 0, 0, 0.2))
+            brightness(1.1)
+            saturate(1.2);
+    }
+    
+    /* Simplify complex effects on mobile for better performance */
+    .welcome-logo::before {
+        animation-duration: 4s; /* Slower gradient animation */
+    }
+}
+
+/* Accessibility: Respect user preferences for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .welcome-logo img {
+        animation: none;
+    }
+    
+    .welcome-logo::before {
+        animation: none;
+        background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4);
+    }
+    
+    .welcome-logo:hover img {
+        transform: scale(1.05);
+        filter: brightness(1.1);
+    }
+    
+    .welcome-logo::after {
+        display: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .welcome-logo::before {
+        background: linear-gradient(45deg, #0066cc, #6600cc, #00cccc);
+    }
+    
+    .welcome-logo img {
+        filter: contrast(1.2) drop-shadow(0 10px 25px rgba(0, 0, 0, 0.3));
+    }
+}
+
+/* Performance optimization for older browsers */
+.welcome-logo img {
+    will-change: transform, filter;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 
