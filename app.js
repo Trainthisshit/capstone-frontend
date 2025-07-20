@@ -7,6 +7,7 @@ let appData = {
 let isFinalListHODLoggedIn = false;
 let currentMentorEditUser = null;
 let currentFinalizeTeam = null;
+let vfxEnabled = false;
 let vfxInitialized = false;
 let newIdeaBuffer = [];
 let currentEditTeam = null;
@@ -125,6 +126,7 @@ function updateStatusItem(itemId, status) {
 }
 
 // Hide loading screen with animation
+// Enhanced hideLoadingScreen with VFX initialization
 function hideLoadingScreen() {
     const loadingScreen = document.getElementById('backend-loading-screen');
     if (loadingScreen) {
@@ -136,10 +138,25 @@ function hideLoadingScreen() {
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
                 isBackendLoading = false;
+                
+                // ✅ CRITICAL: Enable VFX only after loading completes
+                enableVFX();
+                
+                console.log('Loading complete - VFX enabled');
+                
+                // Start VFX if welcome page is active
+                const welcomePage = document.getElementById('welcome');
+                if (welcomePage && welcomePage.classList.contains('active')) {
+                    setTimeout(() => {
+                        initializeUltimatePageAnimation();
+                    }, 300);
+                }
             }, 800);
         }, 500);
     }
 }
+
+  
 
 // Check if backend is responsive
 async function checkBackendHealth() {
@@ -1729,6 +1746,25 @@ function changeLeader() {
     section.style.display = section.style.display === 'none' ? 'block' : 'none';
 }
 
+function enableVFX() {
+    vfxEnabled = true;
+    console.log('VFX enabled - ready to start animations');
+}
+
+function disableVFX() {
+    vfxEnabled = false;
+    vfxInitialized = false;
+    console.log('VFX disabled - stopping all animations');
+    
+    // Clear any running VFX elements
+    const vfxContainers = ['codeParticles', 'neuralNetwork', 'matrixRain'];
+    vfxContainers.forEach(containerId => {
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = ''; // Clear all VFX elements
+        }
+    });
+}
 // Add new member
 function addNewMember() {
     // Check if team already has 4 members
@@ -1922,27 +1958,35 @@ function createMatrixRain() {
   setTimeout(createMatrixRain, 15000);
 }
 
-// REPLACE BOTH showPage functions with this SINGLE version
 function showPage(pageId) {
-    console.log('Navigating to page:', pageId); // Debug log
+    console.log('Navigating to page:', pageId);
     
     // Hide all pages
     document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');
     });
     
-    // Find and show target page
+    // Show target page
     const targetPage = document.getElementById(pageId);
     if (targetPage) {
         targetPage.classList.add('active');
         
-        // Initialize VFX only for welcome page
+        // ✅ UPDATED: Only initialize VFX if loading is complete
         if (pageId === 'welcome') {
-            vfxInitialized = false; // Reset to allow re-animation
-            setTimeout(initializeProfessionalVFX, 300);
+            console.log('Showing welcome page...');
+            
+            // Only start VFX if app has finished loading
+            if (!isBackendLoading) {
+                console.log('App fully loaded - starting VFX...');
+                setTimeout(() => {
+                    initializeUltimatePageAnimation();
+                }, 200);
+            } else {
+                console.log('App still loading - VFX will start after loading completes');
+            }
         }
         
-        // Handle specific page initialization
+        // Handle other page initializations...
         if (pageId === 'view-teams') {
             setTimeout(() => {
                 displayTeams();
@@ -1959,24 +2003,27 @@ function showPage(pageId) {
         }
     } else {
         console.error(`Page with ID "${pageId}" not found`);
-        // Fallback to welcome page
         const welcomePage = document.getElementById('welcome');
         if (welcomePage) {
             welcomePage.classList.add('active');
-            vfxInitialized = false;
-            setTimeout(initializeProfessionalVFX, 300);
+            // Only start VFX if loading is complete
+            if (!isBackendLoading) {
+                setTimeout(() => {
+                    initializeUltimatePageAnimation();
+                }, 200);
+            }
         }
     }
 }
 
 
 
+
 // Initialize VFX when the page loads if welcome is active
-document.addEventListener('DOMContentLoaded', function() {
-  if (document.getElementById('welcome').classList.contains('active')) {
-    setTimeout(initializeProfessionalVFX, 500);
-  }
+document.addEventListener('DOMContentLoaded', function() 
+    console.log('DOM loaded - VFX initialization deferred until app ready');
 });
+
 
 // Confirm add member
 async function confirmAddMember() {
@@ -2359,6 +2406,16 @@ function showError(elementId, message) {
 // ========== ULTIMATE PAGE-WIDE ANIMATION SYSTEM ========== 
 
 function initializeUltimatePageAnimation() {
+    if (!vfxEnabled) {
+        console.log('VFX disabled - skipping animation initialization');
+        return;
+    }
+    
+    if (vfxInitialized) {
+        console.log('VFX already initialized - skipping');
+        return;
+    }
+    
     console.log('Starting Ultimate Page Animation...');
     
     // Reset any existing animations
@@ -2371,6 +2428,8 @@ function initializeUltimatePageAnimation() {
     setTimeout(() => animateIcons(), 1000);
     setTimeout(() => animateButtons(), 2000);
     setTimeout(() => startBackgroundEffects(), 1500);
+    
+    vfxInitialized = true;
 }
 
 function resetAllAnimations() {
@@ -3311,9 +3370,11 @@ function setupCharacterCounters() {
 
 // ====== INITIALIZATION ======
 // Enhanced app initialization with loading screen
-// Enhanced app initialization with loading screen
 async function initializeAppWithLoading() {
     console.log('DOM loaded');
+    
+    // ✅ NEW: Disable VFX during loading
+    disableVFX();
     
     // Show loading screen immediately
     initializeLoadingScreen();
@@ -3349,7 +3410,7 @@ async function initializeAppWithLoading() {
             }, 60000);
         }
         
-        // Initialize app components after data is loaded - FIXED
+        // Initialize app components after data is loaded
         await initializeAppComponents();
         
     } catch (error) {
@@ -3358,6 +3419,7 @@ async function initializeAppWithLoading() {
         updateLoadingProgress(0, 'Initialization failed. Please refresh the page.');
     }
 }
+
 
 
 // Initialize app components (called after data loading)
