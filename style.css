@@ -2218,3 +2218,15 @@ textarea.form-control {
         font-size: var(--font-size-base);
     }
 }
+
+/* ====== COPYRIGHT FIXED POSITION ====== */
+.copyright-fixed {
+  position: fixed;
+  bottom: 10px;
+  right: 20px;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  z-index: 9999;
+  pointer-events: none; /* avoids interfering with clicks */
+}
+
