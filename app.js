@@ -2356,6 +2356,271 @@ function showError(elementId, message) {
     }
 }
 
+// ========== ULTIMATE PAGE-WIDE ANIMATION SYSTEM ========== 
+
+function initializeUltimatePageAnimation() {
+    console.log('Starting Ultimate Page Animation...');
+    
+    // Reset any existing animations
+    resetAllAnimations();
+    
+    // Initialize all animation components with proper timing
+    setTimeout(() => animateTitle(), 200);
+    setTimeout(() => animateSubtitle(), 800);
+    setTimeout(() => animateParagraph(), 1200);
+    setTimeout(() => animateIcons(), 1000);
+    setTimeout(() => animateButtons(), 2000);
+    setTimeout(() => startBackgroundEffects(), 1500);
+}
+
+function resetAllAnimations() {
+    // Clear any existing animation classes
+    document.querySelectorAll('.letter-animate, .btn-animate, .text-animate, .icon-animate').forEach(el => {
+        el.classList.remove('letter-animate', 'btn-animate', 'text-animate', 'icon-animate');
+        el.style.cssText = '';
+    });
+}
+
+function animateTitle() {
+    const titleElement = document.querySelector('.welcome-title .cs-engineering-glitch');
+    if (!titleElement) return;
+    
+    const text = titleElement.textContent;
+    titleElement.innerHTML = '';
+    
+    Array.from(text).forEach((char, index) => {
+        const span = document.createElement('span');
+        span.textContent = char === ' ' ? '\u00A0' : char;
+        span.className = 'letter-animate';
+        
+        // More dramatic random positions
+        const randomX = (Math.random() - 0.5) * window.innerWidth * 1.5;
+        const randomY = (Math.random() - 0.5) * window.innerHeight * 1.2;
+        const randomRotate = (Math.random() - 0.5) * 720; // Full rotations
+        const randomScale = 0.1 + Math.random() * 0.2; // Varied starting scales
+        const delay = index * 0.05; // Faster cascade
+        
+        span.style.setProperty('--start-x', `${randomX}px`);
+        span.style.setProperty('--start-y', `${randomY}px`);
+        span.style.setProperty('--start-rotate', `${randomRotate}deg`);
+        span.style.setProperty('--start-scale', randomScale);
+        span.style.setProperty('--delay', `${delay}s`);
+        
+        titleElement.appendChild(span);
+    });
+    
+    console.log('Title animation initialized');
+}
+
+function animateSubtitle() {
+    const subtitleElement = document.querySelector('.welcome-container h2');
+    if (!subtitleElement) return;
+    
+    const text = subtitleElement.innerHTML; // Preserve HTML for icons
+    subtitleElement.innerHTML = '';
+    
+    // Split text while preserving icons
+    const parts = text.split(/(<span class="capstone-icon">[^<]+<\/span>)/);
+    
+    parts.forEach((part, index) => {
+        if (part.trim() === '') return;
+        
+        let element;
+        if (part.includes('capstone-icon')) {
+            // This is an icon
+            element = document.createElement('span');
+            element.innerHTML = part;
+            element.className = 'icon-animate';
+            
+            const randomX = (Math.random() - 0.5) * window.innerWidth;
+            const randomY = (Math.random() - 0.5) * window.innerHeight * 0.8;
+            const randomRotate = (Math.random() - 0.5) * 540;
+            const randomScale = 0.2 + Math.random() * 0.1;
+            const delay = index * 0.1;
+            
+            element.style.setProperty('--icon-start-x', `${randomX}px`);
+            element.style.setProperty('--icon-start-y', `${randomY}px`);
+            element.style.setProperty('--icon-rotate', `${randomRotate}deg`);
+            element.style.setProperty('--icon-scale', randomScale);
+            element.style.setProperty('--icon-delay', `${delay}s`);
+        } else {
+            // Regular text - animate each word
+            const words = part.split(' ');
+            words.forEach((word, wordIndex) => {
+                if (word.trim() === '') return;
+                
+                element = document.createElement('span');
+                element.textContent = word + ' ';
+                element.className = 'text-animate';
+                
+                const randomX = (Math.random() - 0.5) * window.innerWidth * 0.8;
+                const randomY = (Math.random() - 0.5) * window.innerHeight * 0.6;
+                const randomRotate = (Math.random() - 0.5) * 180;
+                const randomScale = 0.5 + Math.random() * 0.2;
+                const delay = (index * 0.1) + (wordIndex * 0.05);
+                
+                element.style.setProperty('--text-start-x', `${randomX}px`);
+                element.style.setProperty('--text-start-y', `${randomY}px`);
+                element.style.setProperty('--text-rotate', `${randomRotate}deg`);
+                element.style.setProperty('--text-scale', randomScale);
+                element.style.setProperty('--text-delay', `${delay}s`);
+                
+                subtitleElement.appendChild(element);
+            });
+            return; // Skip the general appendChild for words
+        }
+        
+        if (element) {
+            subtitleElement.appendChild(element);
+        }
+    });
+}
+
+function animateParagraph() {
+    const paragraphElement = document.querySelector('.welcome-container p');
+    if (!paragraphElement) return;
+    
+    const text = paragraphElement.textContent;
+    paragraphElement.innerHTML = '';
+    
+    const words = text.split(' ');
+    words.forEach((word, index) => {
+        const span = document.createElement('span');
+        span.textContent = word + ' ';
+        span.className = 'text-animate';
+        
+        const randomX = (Math.random() - 0.5) * window.innerWidth * 0.7;
+        const randomY = (Math.random() - 0.5) * window.innerHeight * 0.5;
+        const randomRotate = (Math.random() - 0.5) * 120;
+        const randomScale = 0.5 + Math.random() * 0.3;
+        const delay = index * 0.03;
+        
+        span.style.setProperty('--text-start-x', `${randomX}px`);
+        span.style.setProperty('--text-start-y', `${randomY}px`);
+        span.style.setProperty('--text-rotate', `${randomRotate}deg`);
+        span.style.setProperty('--text-scale', randomScale);
+        span.style.setProperty('--text-delay', `${delay}s`);
+        
+        paragraphElement.appendChild(span);
+    });
+}
+
+function animateButtons() {
+    const buttons = document.querySelectorAll('.welcome-options .btn');
+    
+    buttons.forEach((button, index) => {
+        button.classList.add('btn-animate');
+        
+        // Buttons come from more extreme positions
+        const randomX = (Math.random() - 0.5) * window.innerWidth * 1.2;
+        const randomY = (Math.random() - 0.5) * window.innerHeight * 0.9;
+        const randomRotate = (Math.random() - 0.5) * 360;
+        const randomScale = 0.3 + Math.random() * 0.2;
+        const delay = index * 0.2;
+        
+        button.style.setProperty('--btn-start-x', `${randomX}px`);
+        button.style.setProperty('--btn-start-y', `${randomY}px`);
+        button.style.setProperty('--btn-rotate', `${randomRotate}deg`);
+        button.style.setProperty('--btn-scale', randomScale);
+        button.style.setProperty('--btn-delay', `${delay}s`);
+    });
+}
+
+function animateIcons() {
+    const icons = document.querySelectorAll('.capstone-icon');
+    
+    icons.forEach((icon, index) => {
+        if (!icon.classList.contains('icon-animate')) {
+            icon.classList.add('icon-animate');
+            
+            const randomX = (Math.random() - 0.5) * window.innerWidth;
+            const randomY = (Math.random() - 0.5) * window.innerHeight * 0.8;
+            const randomRotate = (Math.random() - 0.5) * 720;
+            const randomScale = 0.2 + Math.random() * 0.1;
+            const delay = index * 0.15;
+            
+            icon.style.setProperty('--icon-start-x', `${randomX}px`);
+            icon.style.setProperty('--icon-start-y', `${randomY}px`);
+            icon.style.setProperty('--icon-rotate', `${randomRotate}deg`);
+            icon.style.setProperty('--icon-scale', randomScale);
+            icon.style.setProperty('--icon-delay', `${delay}s`);
+        }
+    });
+}
+
+function startBackgroundEffects() {
+    // Start background particles after main elements settle
+    setTimeout(() => {
+        if (typeof enhancedCreateCodeParticles === 'function') {
+            enhancedCreateCodeParticles();
+        }
+    }, 500);
+    
+    setTimeout(() => {
+        if (typeof createNeuralNetwork === 'function') {
+            createNeuralNetwork();
+        }
+    }, 1000);
+    
+    setTimeout(() => {
+        if (typeof createMatrixRain === 'function') {
+            createMatrixRain();
+        }
+    }, 1500);
+}
+
+// Enhanced page navigation with ultimate animation
+function showPage(pageId) {
+    console.log('Navigating to page:', pageId);
+    
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
+    
+    // Show target page
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) {
+        targetPage.classList.add('active');
+        
+        // Special handling for welcome page with ultimate VFX
+        if (pageId === 'welcome') {
+            console.log('Loading welcome page with Ultimate VFX...');
+            
+            // Reset and start ultimate animation
+            setTimeout(() => {
+                initializeUltimatePageAnimation();
+            }, 100);
+        }
+        
+        // Handle other page initializations...
+        if (pageId === 'view-teams') {
+            setTimeout(() => {
+                displayTeams();
+                displayRemainingStudents();
+            }, 100);
+        } else if (pageId === 'team-management') {
+            setTimeout(() => {
+                displayTeamsManagement();
+            }, 100);
+        } else if (pageId === 'mentor-panel') {
+            setTimeout(() => {
+                initializeMentorPanel();
+            }, 100);
+        }
+    } else {
+        console.error(`Page with ID "${pageId}" not found`);
+        const welcomePage = document.getElementById('welcome');
+        if (welcomePage) {
+            welcomePage.classList.add('active');
+            setTimeout(() => {
+                initializeUltimatePageAnimation();
+            }, 100);
+        }
+    }
+}
+
+
 function hideError(elementId) {
     const errorElement = document.getElementById(elementId);
     if (errorElement) {
