@@ -2521,3 +2521,84 @@ textarea.form-control {
     position: relative !important;
     z-index: 15 !important;
 }
+
+/* ========== EMERGENCY VFX FIXES ========== */
+
+/* Force text visibility - highest priority */
+.welcome-title * {
+    color: #3b82f6 !important;
+    -webkit-text-fill-color: #3b82f6 !important;
+    background: none !important;
+    background-clip: unset !important;
+    -webkit-background-clip: unset !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.cs-engineering-glitch {
+    color: #3b82f6 !important;
+    display: inline-block !important;
+}
+
+.welcome-container h2 {
+    color: #64748b !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.welcome-container p {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Professional Letter Animation - CRITICAL ADDITION */
+.letter-animate {
+    display: inline-block;
+    color: inherit !important;
+    opacity: 0;
+    transform: translate(var(--start-x, 0), var(--start-y, 0)) rotate(var(--start-rotate, 0deg)) scale(0.3);
+    animation: letterSettle 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    animation-delay: var(--delay, 0s);
+}
+
+@keyframes letterSettle {
+    0% {
+        opacity: 0;
+        transform: translate(var(--start-x, 0), var(--start-y, 0)) rotate(var(--start-rotate, 0deg)) scale(0.3);
+    }
+    60% {
+        opacity: 0.8;
+        transform: translate(calc(var(--start-x, 0) * 0.2), calc(var(--start-y, 0) * 0.2)) rotate(calc(var(--start-rotate, 0deg) * 0.2)) scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+}
+
+/* Ensure welcome container is visible */
+.welcome-container {
+    position: relative;
+    z-index: 5;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(0.5px);
+    padding: 2rem;
+    border-radius: 10px;
+}
+
+/* Fix background effects opacity */
+.code-particles {
+    opacity: 0.1 !important;
+    z-index: -5 !important;
+}
+
+.neural-network {
+    opacity: 0.05 !important;
+    z-index: -5 !important;
+}
+
+.matrix-rain {
+    opacity: 0.03 !important;
+    z-index: -5 !important;
+}
