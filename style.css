@@ -2315,18 +2315,17 @@ textarea.form-control {
         max-width: 280px;
     }
 }
-/* ====== ENHANCED CAPSTONE LOGO WITH ALL EFFECTS COMBINED ====== */
+/* ====== PROFESSIONAL WELCOME LAYOUT ====== */
 
-/* Welcome Page Layout with Image */
 .welcome-flex {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 3rem;
+    gap: 4rem;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem;
-    min-height: 80vh;
+    padding: 3rem 2rem;
+    min-height: 85vh;
 }
 
 .welcome-text {
@@ -2335,126 +2334,151 @@ textarea.form-control {
 }
 
 .welcome-text h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    color: #1a1a1a;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
 }
 
 .welcome-text h2 {
-    font-size: 1.5rem;
-    color: var(--color-text-secondary, #64748b);
-    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    color: #4a5568;
+    margin-bottom: 2rem;
     font-weight: 500;
+    line-height: 1.4;
 }
 
 .welcome-text p {
     font-size: 1.1rem;
     line-height: 1.6;
-    color: var(--color-text-secondary, #94a3b8);
-    margin-bottom: 2rem;
+    color: #6b7280;
+    margin-bottom: 3rem;
+    max-width: 500px;
 }
 
-/* Enhanced Logo Container with All Effects */
+.welcome-options {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.welcome-options .btn {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    min-width: 180px;
+    text-align: center;
+}
+
+.btn--primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn--secondary {
+    background: transparent;
+    color: #4a5568;
+    border: 2px solid #e2e8f0;
+}
+
+.btn--secondary:hover {
+    background: #f7fafc;
+    border-color: #cbd5e0;
+    transform: translateY(-2px);
+}
+
+/* Logo Section */
 .welcome-logo {
-    position: relative;
     flex-shrink: 0;
     max-width: 400px;
-    perspective: 1000px;
-    overflow: hidden;
-    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-
-
-.welcome-logo:hover::before {
-    opacity: 0.8;
-}
-
-
-
-.welcome-logo:hover::after {
-    left: 100%;
-    opacity: 1;
-}
-
-/* Main Logo Image with All Combined Effects */
 .welcome-logo img {
-    position: relative;
-    z-index: 1;
     width: 100%;
     height: auto;
     max-width: 350px;
-    border-radius: 12px;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    animation: 
-        gentleFloat 6s ease-in-out infinite,
-        subtleGlow 4s ease-in-out infinite alternate;
-    filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.15));
-    transform-style: preserve-3d;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-
-/* Subtle Glow Animation */
-@keyframes subtleGlow {
-    from {
-        filter: 
-            drop-shadow(0 10px 25px rgba(0, 0, 0, 0.15))
-            drop-shadow(0 0 15px rgba(59, 130, 246, 0.1));
-    }
-    to {
-        filter: 
-            drop-shadow(0 15px 35px rgba(0, 0, 0, 0.2))
-            drop-shadow(0 0 25px rgba(59, 130, 246, 0.3));
-    }
+.welcome-logo img:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.15);
 }
 
-/* Spectacular Hover Effect Combining All Elements */
-.welcome-logo:hover img {
-    transform: 
-        translateY(-15px) 
-        scale(1.08) 
-        rotateY(8deg) 
-        rotateX(3deg);
-    filter: 
-        drop-shadow(0 25px 50px rgba(0, 0, 0, 0.3))
-        drop-shadow(0 0 40px rgba(59, 130, 246, 0.4))
-        brightness(1.15)
-        saturate(1.3)
-        contrast(1.1);
-    animation-play-state: paused; /* Pause float animation on hover */
+/* Background Design Elements */
+#welcome-page {
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    position: relative;
+    overflow: hidden;
 }
 
-/* Pulse Effect for Extra Attraction */
-.welcome-logo:hover {
-    animation: logoContainer 0.6s ease-in-out;
+#welcome-page::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 40%;
+    height: 200%;
+    background: radial-gradient(ellipse, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
+    transform: rotate(-15deg);
+    pointer-events: none;
 }
 
-@keyframes logoContainer {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.02); }
+#welcome-page::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 30%;
+    height: 100%;
+    background: radial-gradient(ellipse, rgba(118, 75, 162, 0.05) 0%, transparent 70%);
+    transform: rotate(25deg);
+    pointer-events: none;
 }
 
-
-
-/* Mobile Responsive Optimizations */
+/* Responsive Design */
 @media (max-width: 768px) {
     .welcome-flex {
         flex-direction: column;
         text-align: center;
-        gap: 2rem;
-        padding: 1rem;
+        gap: 3rem;
+        padding: 2rem 1rem;
     }
     
     .welcome-text h1 {
-        font-size: 2rem;
+        font-size: 2.5rem;
     }
     
     .welcome-text h2 {
         font-size: 1.2rem;
+    }
+    
+    .welcome-options {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .welcome-options .btn {
+        width: 100%;
+        max-width: 300px;
     }
     
     .welcome-logo {
@@ -2464,61 +2488,19 @@ textarea.form-control {
     
     .welcome-logo img {
         max-width: 280px;
-        animation-duration: 8s; /* Slower animation on mobile */
-    }
-    
-    .welcome-logo:hover img {
-        transform: translateY(-8px) scale(1.05); /* Reduced effect on mobile */
-        filter: 
-            drop-shadow(0 15px 30px rgba(0, 0, 0, 0.2))
-            brightness(1.1)
-            saturate(1.2);
-    }
-    
-    /* Simplify complex effects on mobile for better performance */
-    .welcome-logo::before {
-        animation-duration: 4s; /* Slower gradient animation */
     }
 }
 
-/* Accessibility: Respect user preferences for reduced motion */
-@media (prefers-reduced-motion: reduce) {
-    .welcome-logo img {
-        animation: none;
+@media (max-width: 480px) {
+    .welcome-text h1 {
+        font-size: 2rem;
     }
     
-    .welcome-logo::before {
-        animation: none;
-        background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4);
-    }
-    
-    .welcome-logo:hover img {
-        transform: scale(1.05);
-        filter: brightness(1.1);
-    }
-    
-    .welcome-logo::after {
-        display: none;
-    }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-    .welcome-logo::before {
-        background: linear-gradient(45deg, #0066cc, #6600cc, #00cccc);
+    .welcome-flex {
+        padding: 1.5rem 1rem;
     }
     
     .welcome-logo img {
-        filter: contrast(1.2) drop-shadow(0 10px 25px rgba(0, 0, 0, 0.3));
+        max-width: 250px;
     }
 }
-
-/* Performance optimization for older browsers */
-.welcome-logo img {
-    will-change: transform, filter;
-    backface-visibility: hidden;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-
