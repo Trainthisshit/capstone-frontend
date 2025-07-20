@@ -2368,66 +2368,13 @@ textarea.form-control {
     border-radius: 15px;
 }
 
-/* Animated Glowing Border Effect */
-.welcome-logo::before {
-    content: '';
-    position: absolute;
-    top: -3px;
-    left: -3px;
-    right: -3px;
-    bottom: -3px;
-    background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4, #10b981, #3b82f6);
-    background-size: 400% 400%;
-    border-radius: 18px;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    animation: gradientShift 3s ease-in-out infinite;
-}
+
 
 .welcome-logo:hover::before {
     opacity: 0.8;
 }
 
-@keyframes gradientShift {
-    0%, 100% { 
-        background-position: 0% 50%; 
-        filter: hue-rotate(0deg);
-    }
-    25% { 
-        background-position: 100% 50%; 
-        filter: hue-rotate(90deg);
-    }
-    50% { 
-        background-position: 50% 100%; 
-        filter: hue-rotate(180deg);
-    }
-    75% { 
-        background-position: 50% 0%; 
-        filter: hue-rotate(270deg);
-    }
-}
 
-/* Light Sweep Effect */
-.welcome-logo::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.6),
-        transparent
-    );
-    border-radius: 12px;
-    transition: left 0.8s ease;
-    z-index: 2;
-    pointer-events: none;
-    opacity: 0;
-}
 
 .welcome-logo:hover::after {
     left: 100%;
@@ -2450,21 +2397,6 @@ textarea.form-control {
     transform-style: preserve-3d;
 }
 
-/* Floating Animation */
-@keyframes gentleFloat {
-    0%, 100% { 
-        transform: translateY(0px) rotate(0deg);
-    }
-    25% { 
-        transform: translateY(-12px) rotate(1deg);
-    }
-    50% { 
-        transform: translateY(-18px) rotate(0deg);
-    }
-    75% { 
-        transform: translateY(-8px) rotate(-1deg);
-    }
-}
 
 /* Subtle Glow Animation */
 @keyframes subtleGlow {
@@ -2506,15 +2438,7 @@ textarea.form-control {
     50% { transform: scale(1.02); }
 }
 
-/* Additional Sparkle Effect */
-.welcome-logo:active img {
-    transform: 
-        translateY(-10px) 
-        scale(0.95) 
-        rotateY(0deg) 
-        rotateX(0deg);
-    transition: all 0.1s ease-out;
-}
+
 
 /* Mobile Responsive Optimizations */
 @media (max-width: 768px) {
