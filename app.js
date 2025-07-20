@@ -15,33 +15,168 @@ let currentTeam = {};
 let isLoggedIn = false;
 let selectedMentorTeams = {};
 let currentLoggedMentor = null;
+let isBackendLoading = true;
+let loadingProgress = 0;
+let loadingTimeout;
 
 // ====== SUPABASE DATA FUNCTIONS ======
 // Load data from backend
+// Enhanced load data from backend with loading screen
 async function loadDataFromBackend() {
     try {
         console.log('Loading data from backend...');
+        updateLoadingProgress(70, 'Loading application data...');
+        updateStatusItem('status-data', 'loading');
         
         // Load students data
         const studentsResponse = await fetch(`${API_BASE_URL}/api/students`);
+        if (!studentsResponse.ok) {
+            throw new Error('Failed to load students data');
+        }
         const studentsData = await studentsResponse.json();
         appData.students = studentsData.students;
         
+        updateLoadingProgress(85, 'Loading mentor information...');
+        
         // Load mentors data
         const mentorsResponse = await fetch(`${API_BASE_URL}/api/mentors`);
+        if (!mentorsResponse.ok) {
+            throw new Error('Failed to load mentors data');
+        }
         const mentorsData = await mentorsResponse.json();
         appData.mentors = mentorsData.mentors.map(mentor => mentor.name);
         
-        console.log('Data loaded successfully:', { 
+        updateLoadingProgress(95, 'Finalizing setup...');
+        
+        console.log('Data loaded successfully:', {
             students: Object.keys(appData.students).length,
             mentors: appData.mentors.length
         });
         
+        // Mark as completed and hide loading screen
+        setTimeout(() => {
+            hideLoadingScreen();
+        }, 500);
+        
+        return true;
+        
     } catch (error) {
         console.error('Error loading data from backend:', error);
+        updateStatusItem('status-data', 'error');
+        updateLoadingProgress(30, 'Failed to load data, retrying...');
+        
+        // Retry after 3 seconds
+        setTimeout(async () => {
+            await loadDataFromBackend();
+        }, 3000);
+        
+        return false;
     }
 }
 
+function initializeLoadingScreen() {
+    updateLoadingProgress(10, 'Initializing application...');
+    updateStatusItem('status-frontend', 'loading');
+    
+    // Set a timeout to detect if backend is sleeping
+    loadingTimeout = setTimeout(() => {
+        if (isBackendLoading) {
+            updateLoadingProgress(30, 'Backend is starting up, please wait...');
+            updateStatusItem('status-backend', 'loading');
+        }
+    }, 2000);
+}
+
+// Update loading progress
+function updateLoadingProgress(percentage, message) {
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    
+    if (progressFill) {
+        progressFill.style.width = percentage + '%';
+    }
+    
+    if (progressText) {
+        progressText.textContent = message;
+    }
+    
+    loadingProgress = percentage;
+}
+
+// Update status item
+function updateStatusItem(itemId, status) {
+    const statusItem = document.getElementById(itemId);
+    if (statusItem) {
+        statusItem.className = `status-item ${status}`;
+        
+        // Update icon based on status
+        const icon = statusItem.querySelector('.status-icon');
+        if (icon) {
+            if (status === 'completed') {
+                icon.innerHTML = '';
+            } else if (status === 'loading') {
+                icon.innerHTML = '';
+            } else if (status === 'error') {
+                icon.innerHTML = '';
+            }
+        }
+    }
+}
+
+// Hide loading screen with animation
+function hideLoadingScreen() {
+    const loadingScreen = document.getElementById('backend-loading-screen');
+    if (loadingScreen) {
+        updateLoadingProgress(100, 'Ready to go!');
+        updateStatusItem('status-data', 'completed');
+        
+        setTimeout(() => {
+            loadingScreen.classList.add('fade-out');
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                isBackendLoading = false;
+            }, 800);
+        }, 500);
+    }
+}
+
+// Check if backend is responsive
+async function checkBackendHealth() {
+    try {
+        console.log('Checking backend health...');
+        updateStatusItem('status-frontend', 'completed');
+        updateLoadingProgress(20, 'Checking server status...');
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
+        const response = await fetch(`${API_BASE_URL}/api/health`, {
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (response.ok) {
+            updateStatusItem('status-backend', 'completed');
+            updateLoadingProgress(60, 'Server connected successfully!');
+            return true;
+        } else {
+            throw new Error('Backend health check failed');
+        }
+    } catch (error) {
+        console.error('Backend health check failed:', error);
+        
+        if (error.name === 'AbortError') {
+            updateLoadingProgress(40, 'Server is starting up, this may take a moment...');
+            updateStatusItem('status-backend', 'loading');
+        } else {
+            updateStatusItem('status-backend', 'error');
+            updateLoadingProgress(25, 'Connection issues, retrying...');
+        }
+        
+        return false;
+    }
+}
 async function getTeams() {
     try {
         const response = await fetch(`${API_BASE_URL}/api/teams`);
@@ -2584,7 +2719,58 @@ function setupCharacterCounters() {
 }
 
 // ====== INITIALIZATION ======
-function initializeApp() {
+// Enhanced app initialization with loading screen
+// Enhanced app initialization with loading screen
+async function initializeAppWithLoading() {
+    console.log('DOM loaded');
+    
+    // Show loading screen immediately
+    initializeLoadingScreen();
+    
+    try {
+        // Check if backend is healthy first
+        const backendHealthy = await checkBackendHealth();
+        
+        if (backendHealthy) {
+            // Backend is responsive, load data
+            await loadDataFromBackend();
+        } else {
+            // Backend might be sleeping, wait and retry
+            updateLoadingProgress(50, 'Waking up server, please be patient...');
+            
+            // Retry every 3 seconds until backend responds
+            const retryInterval = setInterval(async () => {
+                const health = await checkBackendHealth();
+                if (health) {
+                    clearInterval(retryInterval);
+                    await loadDataFromBackend();
+                }
+            }, 3000);
+            
+            // Set maximum wait time of 60 seconds
+            setTimeout(() => {
+                clearInterval(retryInterval);
+                if (isBackendLoading) {
+                    updateStatusItem('status-backend', 'error');
+                    updateStatusItem('status-data', 'error');
+                    updateLoadingProgress(0, 'Connection timeout. Please refresh the page.');
+                }
+            }, 60000);
+        }
+        
+        // Initialize app components after data is loaded - FIXED
+        await initializeAppComponents();
+        
+    } catch (error) {
+        console.error('App initialization failed:', error);
+        updateStatusItem('status-data', 'error');
+        updateLoadingProgress(0, 'Initialization failed. Please refresh the page.');
+    }
+}
+
+
+// Initialize app components (called after data loading)
+async function initializeAppComponents() {
     // Populate all dropdowns
     populateSelects();
     populateDepartmentDropdowns();
@@ -2618,6 +2804,8 @@ function initializeApp() {
             }
         });
     }
+    
+    // Add all your existing event listeners here
     const mentorEditLoginBtn = document.getElementById('mentor-edit-login-btn');
     const mentorEditLogoutBtn = document.getElementById('mentor-edit-logout-btn');
     const mentorEditPasswordField = document.getElementById('mentor-edit-password');
@@ -2635,10 +2823,12 @@ function initializeApp() {
             if (e.key === 'Enter') handleMentorEditLogin();
         });
     }
+    
     const finalListHodLoginForm = document.getElementById('final-list-hod-login-form');
     if (finalListHodLoginForm) {
         finalListHodLoginForm.addEventListener('submit', handleFinalListHODLogin);
     }
+    
     const hodLoginForm = document.getElementById('hod-login-form');
     if (hodLoginForm) {
         hodLoginForm.addEventListener('submit', handleHODLogin);
@@ -2649,6 +2839,7 @@ function initializeApp() {
     if (teamEditForm) {
         teamEditForm.addEventListener('submit', handleTeamEditForm);
     }
+    
     // Form event listeners
     const teamForm = document.getElementById('team-details-form');
     if (teamForm) {
@@ -2715,13 +2906,7 @@ function initializeApp() {
 
 
 // ====== START APPLICATION ======
-document.addEventListener('DOMContentLoaded', async function() {
-    console.log('DOM loaded');
-    await loadDataFromBackend();
-    await initializeApp();
-    
-    // Your existing event listeners...
-});
+document.addEventListener('DOMContentLoaded', initializeAppWithLoading);
 
 
 // Make functions globally available for onclick handlers
