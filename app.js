@@ -7,8 +7,6 @@ let appData = {
 let isFinalListHODLoggedIn = false;
 let currentMentorEditUser = null;
 let currentFinalizeTeam = null;
-let vfxEnabled = false;
-let vfxInitialized = false;
 let newIdeaBuffer = [];
 let currentEditTeam = null;
 let isHODLoggedIn = false;
@@ -23,6 +21,7 @@ let loadingTimeout;
 
 // ====== SUPABASE DATA FUNCTIONS ======
 // Load data from backend
+// Enhanced load data from backend with loading screen
 async function loadDataFromBackend() {
     try {
         console.log('Loading data from backend...');
@@ -63,21 +62,15 @@ async function loadDataFromBackend() {
         
     } catch (error) {
         console.error('Error loading data from backend:', error);
+        updateStatusItem('status-data', 'error');
+        updateLoadingProgress(30, 'Failed to load data, retrying...');
         
-        // ✅ CRITICAL FIX: Use fallback data if backend fails
-        console.log('Using fallback data...');
+        // Retry after 3 seconds
+        setTimeout(async () => {
+            await loadDataFromBackend();
+        }, 3000);
         
-        // Load fallback data
-        loadFallbackData();
-        
-        updateLoadingProgress(95, 'Using offline data...');
-        updateStatusItem('status-data', 'completed');
-        
-        setTimeout(() => {
-            hideLoadingScreen();
-        }, 1000);
-        
-        return true;
+        return false;
     }
 }
 
@@ -131,7 +124,6 @@ function updateStatusItem(itemId, status) {
 }
 
 // Hide loading screen with animation
-// Enhanced hideLoadingScreen with VFX initialization
 function hideLoadingScreen() {
     const loadingScreen = document.getElementById('backend-loading-screen');
     if (loadingScreen) {
@@ -143,28 +135,12 @@ function hideLoadingScreen() {
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
                 isBackendLoading = false;
-                
-                // ✅ CRITICAL: Enable VFX only after loading completes
-                enableVFX();
-                
-                console.log('Loading complete - VFX enabled');
-                
-                // Start VFX if welcome page is active
-                const welcomePage = document.getElementById('welcome');
-                if (welcomePage && welcomePage.classList.contains('active')) {
-                    setTimeout(() => {
-                        initializeUltimatePageAnimation();
-                    }, 300);
-                }
             }, 800);
         }, 500);
     }
 }
 
-  
-
 // Check if backend is responsive
-// REPLACE your existing checkBackendHealth function
 async function checkBackendHealth() {
     try {
         console.log('Checking backend health...');
@@ -172,7 +148,7 @@ async function checkBackendHealth() {
         updateLoadingProgress(20, 'Checking server status...');
         
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000); // Reduced timeout
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
         
         const response = await fetch(`${API_BASE_URL}/api/health`, {
             signal: controller.signal
@@ -190,14 +166,17 @@ async function checkBackendHealth() {
     } catch (error) {
         console.error('Backend health check failed:', error);
         
-        // ✅ CRITICAL FIX: Don't get stuck, proceed anyway
-        console.log('Proceeding without backend health check...');
-        updateStatusItem('status-backend', 'completed'); // Mark as completed anyway
-        updateLoadingProgress(60, 'Proceeding with local data...');
-        return true; // Return true to continue loading
+        if (error.name === 'AbortError') {
+            updateLoadingProgress(40, 'Server is starting up, this may take a moment...');
+            updateStatusItem('status-backend', 'loading');
+        } else {
+            updateStatusItem('status-backend', 'error');
+            updateLoadingProgress(25, 'Connection issues, retrying...');
+        }
+        
+        return false;
     }
 }
-
 async function getTeams() {
     try {
         const response = await fetch(`${API_BASE_URL}/api/teams`);
@@ -265,6 +244,40 @@ async function populateMentorDropdowns() {
 }
 
 
+// Add showPage function if missing
+function showPage(pageId) {
+    console.log('Showing page:', pageId);
+    
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    
+    // Show the target page
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) {
+        targetPage.classList.add('active');
+        console.log('Page shown successfully:', pageId);
+    } else {
+        console.error('Page not found:', pageId);
+    }
+    
+    // Handle specific page initialization
+    if (pageId === 'view-teams') {
+        setTimeout(async () => {
+            console.log('Loading view teams...');
+            await displayTeams();
+            await displayRemainingStudents();
+        }, 100);
+    } else if (pageId === 'team-management') {
+        setTimeout(async () => {
+            console.log('Loading team management...');
+            await displayTeamsManagement();
+        }, 100);
+    } else if (pageId === 'mentor-panel') {
+        setTimeout(() => {
+            initializeMentorPanel();
+        }, 100);
+    }
+}
 async function displayTeams() {
     try {
         console.log('Fetching teams for display...');
@@ -586,101 +599,6 @@ async function handleTeamEditForm(event) {
         showError('edit-error', 'Error updating team: ' + error.message);
     }
 }
-
-// ========== PROFESSIONAL LETTER ANIMATION SYSTEM ========== 
-
-function initializeLetterAnimation() {
-    console.log('Starting letter animation...');
-    
-    const titleElement = document.querySelector('.welcome-title .cs-engineering-glitch');
-    if (!titleElement) {
-        console.log('Title element not found');
-        return;
-    }
-    
-    const text = titleElement.textContent;
-    console.log('Animating text:', text);
-    
-    titleElement.innerHTML = '';
-    
-    Array.from(text).forEach((char, index) => {
-        const span = document.createElement('span');
-        span.textContent = char === ' ' ? '\u00A0' : char;
-        span.className = 'letter-animate';
-        
-        // Random starting positions - wider range for better effect
-        const randomX = (Math.random() - 0.5) * 1000;
-        const randomY = (Math.random() - 0.5) * 800;
-        const randomRotate = (Math.random() - 0.5) * 360;
-        const delay = index * 0.08;
-        
-        span.style.setProperty('--start-x', `${randomX}px`);
-        span.style.setProperty('--start-y', `${randomY}px`);
-        span.style.setProperty('--start-rotate', `${randomRotate}deg`);
-        span.style.setProperty('--delay', `${delay}s`);
-        
-        titleElement.appendChild(span);
-    });
-    
-    console.log('Letter animation setup complete');
-}
-
-function enhancedCreateCodeParticles() {
-    const container = document.getElementById('codeParticles');
-    if (!container) return;
-    
-    const codeSnippets = [
-        'class Team {', 'function register()', 'const mentor =', 'let project;',
-        'if (team.ready)', '=> success', 'async/await', 'import React',
-        'console.log()', 'return data;', 'try { }', 'catch (err)'
-    ];
-    
-    setInterval(() => {
-        if (document.getElementById('welcome')?.classList.contains('active')) {
-            const particle = document.createElement('div');
-            particle.className = 'code-particle';
-            particle.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 3 + 's';
-            particle.style.animationDuration = (20 + Math.random() * 10) + 's';
-            particle.style.fontSize = '10px';
-            particle.style.color = 'rgba(59, 130, 246, 0.2)';
-            container.appendChild(particle);
-            
-            setTimeout(() => {
-                if (particle.parentNode) {
-                    particle.parentNode.removeChild(particle);
-                }
-            }, 30000);
-        }
-    }, 3000);
-}
-
-function initializeAllVFX() {
-    console.log('Initializing all VFX systems...');
-    
-    // Clear any existing VFX
-    vfxInitialized = false;
-    
-    setTimeout(() => {
-        initializeLetterAnimation();
-    }, 500);
-    
-    setTimeout(() => {
-        enhancedCreateCodeParticles();
-    }, 1000);
-    
-    setTimeout(() => {
-        if (typeof createNeuralNetwork === 'function') createNeuralNetwork();
-    }, 1500);
-    
-    setTimeout(() => {
-        if (typeof createMatrixRain === 'function') createMatrixRain();
-    }, 2000);
-    
-    vfxInitialized = true;
-}
-
 
 // Add this function for debugging
 async function debugSupabase() {
@@ -1321,59 +1239,25 @@ async function getRegisteredStudents() {
 
 // ====== UTILITY FUNCTIONS ======
 function showPage(pageId) {
-    console.log('Navigating to page:', pageId);
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
     
-    // Hide all pages
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
-    
-    // Find and show target page
-    const targetPage = document.getElementById(pageId);
-    if (targetPage) {
-        targetPage.classList.add('active');
-        
-        // Special handling for welcome page with VFX
-        if (pageId === 'welcome') {
-            console.log('Loading welcome page with VFX...');
-            
-            // Reset VFX state
-            vfxInitialized = false;
-            
-            // Initialize VFX with proper timing
-            setTimeout(() => {
-                initializeAllVFX();
-            }, 200);
-        }
-        
-        // Handle other page initializations...
-        if (pageId === 'view-teams') {
-            setTimeout(() => {
-                displayTeams();
-                displayRemainingStudents();
-            }, 100);
-        } else if (pageId === 'team-management') {
-            setTimeout(() => {
-                displayTeamsManagement();
-            }, 100);
-        } else if (pageId === 'mentor-panel') {
-            setTimeout(() => {
-                initializeMentorPanel();
-            }, 100);
-        }
-    } else {
-        console.error(`Page with ID "${pageId}" not found`);
-        // Fallback to welcome
-        const welcomePage = document.getElementById('welcome');
-        if (welcomePage) {
-            welcomePage.classList.add('active');
-            setTimeout(() => {
-                initializeAllVFX();
-            }, 200);
-        }
+    // Handle specific page initialization
+    if (pageId === 'view-teams') {
+        setTimeout(() => {
+            displayTeams();
+            displayRemainingStudents();
+        }, 100);
+    } else if (pageId === 'team-management') {
+        setTimeout(() => {
+            displayTeamsManagement();
+        }, 100);
+    } else if (pageId === 'mentor-panel') {
+        setTimeout(() => {
+            initializeMentorPanel();
+        }, 100);
     }
 }
-
 function initializeMentorPanel() {
     currentLoggedMentor = null;
     const mentorDashboard = document.getElementById('mentor-dashboard');
@@ -1749,25 +1633,6 @@ function changeLeader() {
     section.style.display = section.style.display === 'none' ? 'block' : 'none';
 }
 
-function enableVFX() {
-    vfxEnabled = true;
-    console.log('VFX enabled - ready to start animations');
-}
-
-function disableVFX() {
-    vfxEnabled = false;
-    vfxInitialized = false;
-    console.log('VFX disabled - stopping all animations');
-    
-    // Clear any running VFX elements
-    const vfxContainers = ['codeParticles', 'neuralNetwork', 'matrixRain'];
-    vfxContainers.forEach(containerId => {
-        const container = document.getElementById(containerId);
-        if (container) {
-            container.innerHTML = ''; // Clear all VFX elements
-        }
-    });
-}
 // Add new member
 function addNewMember() {
     // Check if team already has 4 members
@@ -1787,246 +1652,6 @@ function cancelAddMember() {
     document.getElementById('new-member-dept').value = '';
     document.getElementById('new-member-student').value = '';
 }
-
-// ====== PROFESSIONAL VFX INITIALIZATION ====== 
-
-function initializeProfessionalVFX() {
-    if (vfxInitialized) return;
-    vfxInitialized = true;
-    
-    console.log('Initializing Professional VFX...');
-    
-    setTimeout(() => {
-        initializeLetterAnimation(); // This was missing!
-        createCodeParticles();
-        createNeuralNetwork();
-        createMatrixRain();
-    }, 100);
-}
-
-
-function initializeLetterAnimation() {
-    const titleElement = document.querySelector('.welcome-title .cs-engineering-glitch');
-    if (!titleElement) return;
-    
-    const text = titleElement.textContent;
-    titleElement.innerHTML = '';
-    
-    Array.from(text).forEach((char, index) => {
-        const span = document.createElement('span');
-        span.textContent = char === ' ' ? '\u00A0' : char;
-        span.className = 'letter-animate';
-        
-        const randomX = (Math.random() - 0.5) * 800;
-        const randomY = (Math.random() - 0.5) * 600;
-        const randomRotate = (Math.random() - 0.5) * 720;
-        const delay = index * 0.1;
-        
-        span.style.setProperty('--start-x', `${randomX}px`);
-        span.style.setProperty('--start-y', `${randomY}px`);
-        span.style.setProperty('--start-rotate', `${randomRotate}deg`);
-        span.style.setProperty('--delay', `${delay}s`);
-        
-        titleElement.appendChild(span);
-    });
-}
-
-function createCodeParticles() {
-  const container = document.getElementById('codeParticles');
-  if (!container) return;
-  
-  const codeSnippets = [
-    'class Capstone {',
-    'function register() {',
-    'const team = [];',
-    'let mentor = null;',
-    'if (project.approved)',
-    'return success;',
-    '// CS Engineering',
-    'async await fetch',
-    'console.log("VFX");',
-    'export default App',
-    'import React from',
-    'useState([])',
-    '<Team />',
-    '.then(response)',
-    'Object.keys(data)',
-    'Math.random()',
-    'setTimeout(() => {',
-    'document.query',
-    'addEventListener',
-    'preventDefault()'
-  ];
-  
-  setInterval(() => {
-    if (document.getElementById('welcome').classList.contains('active')) {
-      const particle = document.createElement('div');
-      particle.className = 'code-particle';
-      particle.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
-      particle.style.left = Math.random() * 100 + '%';
-      particle.style.animationDelay = Math.random() * 2 + 's';
-      container.appendChild(particle);
-      
-      setTimeout(() => {
-        if (particle.parentNode) {
-          particle.parentNode.removeChild(particle);
-        }
-      }, 15000);
-    }
-  }, 2000);
-}
-
-function createNeuralNetwork() {
-  const container = document.getElementById('neuralNetwork');
-  if (!container) return;
-  
-  // Create neural nodes
-  const nodeCount = 15;
-  const nodes = [];
-  
-  for (let i = 0; i < nodeCount; i++) {
-    const node = document.createElement('div');
-    node.className = 'neural-node';
-    node.style.left = Math.random() * 100 + '%';
-    node.style.top = Math.random() * 100 + '%';
-    node.style.animationDelay = Math.random() * 4 + 's';
-    container.appendChild(node);
-    nodes.push({
-      element: node,
-      x: parseFloat(node.style.left),
-      y: parseFloat(node.style.top)
-    });
-  }
-  
-  // Create connections between nearby nodes
-  nodes.forEach((nodeA, i) => {
-    nodes.slice(i + 1).forEach(nodeB => {
-      const distance = Math.sqrt(
-        Math.pow(nodeA.x - nodeB.x, 2) + Math.pow(nodeA.y - nodeB.y, 2)
-      );
-      
-      if (distance < 30) { // Only connect nearby nodes
-        const connection = document.createElement('div');
-        connection.className = 'neural-connection';
-        
-        const angle = Math.atan2(nodeB.y - nodeA.y, nodeB.x - nodeA.x);
-        const length = distance;
-        
-        connection.style.width = length + '%';
-        connection.style.left = nodeA.x + '%';
-        connection.style.top = nodeA.y + '%';
-        connection.style.transform = `rotate(${angle}rad)`;
-        connection.style.animationDelay = Math.random() * 6 + 's';
-        
-        container.appendChild(connection);
-      }
-    });
-  });
-}
-
-function createMatrixRain() {
-  const container = document.getElementById('matrixRain');
-  if (!container) return;
-  
-  const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz<>{}[]()';
-  const columnCount = Math.floor(window.innerWidth / 20);
-  
-  for (let i = 0; i < columnCount; i++) {
-    setTimeout(() => {
-      if (document.getElementById('welcome').classList.contains('active')) {
-        const column = document.createElement('div');
-        column.className = 'matrix-column';
-        column.style.left = (i * 20) + 'px';
-        column.style.animationDelay = Math.random() * 5 + 's';
-        column.style.animationDuration = (8 + Math.random() * 4) + 's';
-        
-        let columnText = '';
-        for (let j = 0; j < 20; j++) {
-          columnText += characters.charAt(Math.floor(Math.random() * characters.length)) + '\n';
-        }
-        column.textContent = columnText;
-        
-        container.appendChild(column);
-        
-        setTimeout(() => {
-          if (column.parentNode) {
-            column.parentNode.removeChild(column);
-          }
-        }, 12000);
-      }
-    }, i * 100);
-  }
-  
-  // Repeat the effect
-  setTimeout(createMatrixRain, 15000);
-}
-
-function showPage(pageId) {
-    console.log('Navigating to page:', pageId);
-    
-    // Hide all pages
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
-    
-    // Show target page
-    const targetPage = document.getElementById(pageId);
-    if (targetPage) {
-        targetPage.classList.add('active');
-        
-        // ✅ UPDATED: Only initialize VFX if loading is complete
-        if (pageId === 'welcome') {
-            console.log('Showing welcome page...');
-            
-            // Only start VFX if app has finished loading
-            if (!isBackendLoading) {
-                console.log('App fully loaded - starting VFX...');
-                setTimeout(() => {
-                    initializeUltimatePageAnimation();
-                }, 200);
-            } else {
-                console.log('App still loading - VFX will start after loading completes');
-            }
-        }
-        
-        // Handle other page initializations...
-        if (pageId === 'view-teams') {
-            setTimeout(() => {
-                displayTeams();
-                displayRemainingStudents();
-            }, 100);
-        } else if (pageId === 'team-management') {
-            setTimeout(() => {
-                displayTeamsManagement();
-            }, 100);
-        } else if (pageId === 'mentor-panel') {
-            setTimeout(() => {
-                initializeMentorPanel();
-            }, 100);
-        }
-    } else {
-        console.error(`Page with ID "${pageId}" not found`);
-        const welcomePage = document.getElementById('welcome');
-        if (welcomePage) {
-            welcomePage.classList.add('active');
-            // Only start VFX if loading is complete
-            if (!isBackendLoading) {
-                setTimeout(() => {
-                    initializeUltimatePageAnimation();
-                }, 200);
-            }
-        }
-    }
-}
-
-
-
-
-// Initialize VFX when the page loads if welcome is active
-document.addEventListener('DOMContentLoaded', function() 
-    console.log('DOM loaded - VFX initialization deferred until app ready');
-});
-
 
 // Confirm add member
 async function confirmAddMember() {
@@ -2406,283 +2031,6 @@ function showError(elementId, message) {
     }
 }
 
-// ========== ULTIMATE PAGE-WIDE ANIMATION SYSTEM ========== 
-
-function initializeUltimatePageAnimation() {
-    if (!vfxEnabled) {
-        console.log('VFX disabled - skipping animation initialization');
-        return;
-    }
-    
-    if (vfxInitialized) {
-        console.log('VFX already initialized - skipping');
-        return;
-    }
-    
-    console.log('Starting Ultimate Page Animation...');
-    
-    // Reset any existing animations
-    resetAllAnimations();
-    
-    // Initialize all animation components with proper timing
-    setTimeout(() => animateTitle(), 200);
-    setTimeout(() => animateSubtitle(), 800);
-    setTimeout(() => animateParagraph(), 1200);
-    setTimeout(() => animateIcons(), 1000);
-    setTimeout(() => animateButtons(), 2000);
-    setTimeout(() => startBackgroundEffects(), 1500);
-    
-    vfxInitialized = true;
-}
-
-function resetAllAnimations() {
-    // Clear any existing animation classes
-    document.querySelectorAll('.letter-animate, .btn-animate, .text-animate, .icon-animate').forEach(el => {
-        el.classList.remove('letter-animate', 'btn-animate', 'text-animate', 'icon-animate');
-        el.style.cssText = '';
-    });
-}
-
-function animateTitle() {
-    const titleElement = document.querySelector('.welcome-title .cs-engineering-glitch');
-    if (!titleElement) return;
-    
-    const text = titleElement.textContent;
-    titleElement.innerHTML = '';
-    
-    Array.from(text).forEach((char, index) => {
-        const span = document.createElement('span');
-        span.textContent = char === ' ' ? '\u00A0' : char;
-        span.className = 'letter-animate';
-        
-        // More dramatic random positions
-        const randomX = (Math.random() - 0.5) * window.innerWidth * 1.5;
-        const randomY = (Math.random() - 0.5) * window.innerHeight * 1.2;
-        const randomRotate = (Math.random() - 0.5) * 720; // Full rotations
-        const randomScale = 0.1 + Math.random() * 0.2; // Varied starting scales
-        const delay = index * 0.05; // Faster cascade
-        
-        span.style.setProperty('--start-x', `${randomX}px`);
-        span.style.setProperty('--start-y', `${randomY}px`);
-        span.style.setProperty('--start-rotate', `${randomRotate}deg`);
-        span.style.setProperty('--start-scale', randomScale);
-        span.style.setProperty('--delay', `${delay}s`);
-        
-        titleElement.appendChild(span);
-    });
-    
-    console.log('Title animation initialized');
-}
-
-function animateSubtitle() {
-    const subtitleElement = document.querySelector('.welcome-container h2');
-    if (!subtitleElement) return;
-    
-    const text = subtitleElement.innerHTML; // Preserve HTML for icons
-    subtitleElement.innerHTML = '';
-    
-    // Split text while preserving icons
-    const parts = text.split(/(<span class="capstone-icon">[^<]+<\/span>)/);
-    
-    parts.forEach((part, index) => {
-        if (part.trim() === '') return;
-        
-        let element;
-        if (part.includes('capstone-icon')) {
-            // This is an icon
-            element = document.createElement('span');
-            element.innerHTML = part;
-            element.className = 'icon-animate';
-            
-            const randomX = (Math.random() - 0.5) * window.innerWidth;
-            const randomY = (Math.random() - 0.5) * window.innerHeight * 0.8;
-            const randomRotate = (Math.random() - 0.5) * 540;
-            const randomScale = 0.2 + Math.random() * 0.1;
-            const delay = index * 0.1;
-            
-            element.style.setProperty('--icon-start-x', `${randomX}px`);
-            element.style.setProperty('--icon-start-y', `${randomY}px`);
-            element.style.setProperty('--icon-rotate', `${randomRotate}deg`);
-            element.style.setProperty('--icon-scale', randomScale);
-            element.style.setProperty('--icon-delay', `${delay}s`);
-        } else {
-            // Regular text - animate each word
-            const words = part.split(' ');
-            words.forEach((word, wordIndex) => {
-                if (word.trim() === '') return;
-                
-                element = document.createElement('span');
-                element.textContent = word + ' ';
-                element.className = 'text-animate';
-                
-                const randomX = (Math.random() - 0.5) * window.innerWidth * 0.8;
-                const randomY = (Math.random() - 0.5) * window.innerHeight * 0.6;
-                const randomRotate = (Math.random() - 0.5) * 180;
-                const randomScale = 0.5 + Math.random() * 0.2;
-                const delay = (index * 0.1) + (wordIndex * 0.05);
-                
-                element.style.setProperty('--text-start-x', `${randomX}px`);
-                element.style.setProperty('--text-start-y', `${randomY}px`);
-                element.style.setProperty('--text-rotate', `${randomRotate}deg`);
-                element.style.setProperty('--text-scale', randomScale);
-                element.style.setProperty('--text-delay', `${delay}s`);
-                
-                subtitleElement.appendChild(element);
-            });
-            return; // Skip the general appendChild for words
-        }
-        
-        if (element) {
-            subtitleElement.appendChild(element);
-        }
-    });
-}
-
-function animateParagraph() {
-    const paragraphElement = document.querySelector('.welcome-container p');
-    if (!paragraphElement) return;
-    
-    const text = paragraphElement.textContent;
-    paragraphElement.innerHTML = '';
-    
-    const words = text.split(' ');
-    words.forEach((word, index) => {
-        const span = document.createElement('span');
-        span.textContent = word + ' ';
-        span.className = 'text-animate';
-        
-        const randomX = (Math.random() - 0.5) * window.innerWidth * 0.7;
-        const randomY = (Math.random() - 0.5) * window.innerHeight * 0.5;
-        const randomRotate = (Math.random() - 0.5) * 120;
-        const randomScale = 0.5 + Math.random() * 0.3;
-        const delay = index * 0.03;
-        
-        span.style.setProperty('--text-start-x', `${randomX}px`);
-        span.style.setProperty('--text-start-y', `${randomY}px`);
-        span.style.setProperty('--text-rotate', `${randomRotate}deg`);
-        span.style.setProperty('--text-scale', randomScale);
-        span.style.setProperty('--text-delay', `${delay}s`);
-        
-        paragraphElement.appendChild(span);
-    });
-}
-
-function animateButtons() {
-    const buttons = document.querySelectorAll('.welcome-options .btn');
-    
-    buttons.forEach((button, index) => {
-        button.classList.add('btn-animate');
-        
-        // Buttons come from more extreme positions
-        const randomX = (Math.random() - 0.5) * window.innerWidth * 1.2;
-        const randomY = (Math.random() - 0.5) * window.innerHeight * 0.9;
-        const randomRotate = (Math.random() - 0.5) * 360;
-        const randomScale = 0.3 + Math.random() * 0.2;
-        const delay = index * 0.2;
-        
-        button.style.setProperty('--btn-start-x', `${randomX}px`);
-        button.style.setProperty('--btn-start-y', `${randomY}px`);
-        button.style.setProperty('--btn-rotate', `${randomRotate}deg`);
-        button.style.setProperty('--btn-scale', randomScale);
-        button.style.setProperty('--btn-delay', `${delay}s`);
-    });
-}
-
-function animateIcons() {
-    const icons = document.querySelectorAll('.capstone-icon');
-    
-    icons.forEach((icon, index) => {
-        if (!icon.classList.contains('icon-animate')) {
-            icon.classList.add('icon-animate');
-            
-            const randomX = (Math.random() - 0.5) * window.innerWidth;
-            const randomY = (Math.random() - 0.5) * window.innerHeight * 0.8;
-            const randomRotate = (Math.random() - 0.5) * 720;
-            const randomScale = 0.2 + Math.random() * 0.1;
-            const delay = index * 0.15;
-            
-            icon.style.setProperty('--icon-start-x', `${randomX}px`);
-            icon.style.setProperty('--icon-start-y', `${randomY}px`);
-            icon.style.setProperty('--icon-rotate', `${randomRotate}deg`);
-            icon.style.setProperty('--icon-scale', randomScale);
-            icon.style.setProperty('--icon-delay', `${delay}s`);
-        }
-    });
-}
-
-function startBackgroundEffects() {
-    // Start background particles after main elements settle
-    setTimeout(() => {
-        if (typeof enhancedCreateCodeParticles === 'function') {
-            enhancedCreateCodeParticles();
-        }
-    }, 500);
-    
-    setTimeout(() => {
-        if (typeof createNeuralNetwork === 'function') {
-            createNeuralNetwork();
-        }
-    }, 1000);
-    
-    setTimeout(() => {
-        if (typeof createMatrixRain === 'function') {
-            createMatrixRain();
-        }
-    }, 1500);
-}
-
-// Enhanced page navigation with ultimate animation
-function showPage(pageId) {
-    console.log('Navigating to page:', pageId);
-    
-    // Hide all pages
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
-    
-    // Show target page
-    const targetPage = document.getElementById(pageId);
-    if (targetPage) {
-        targetPage.classList.add('active');
-        
-        // Special handling for welcome page with ultimate VFX
-        if (pageId === 'welcome') {
-            console.log('Loading welcome page with Ultimate VFX...');
-            
-            // Reset and start ultimate animation
-            setTimeout(() => {
-                initializeUltimatePageAnimation();
-            }, 100);
-        }
-        
-        // Handle other page initializations...
-        if (pageId === 'view-teams') {
-            setTimeout(() => {
-                displayTeams();
-                displayRemainingStudents();
-            }, 100);
-        } else if (pageId === 'team-management') {
-            setTimeout(() => {
-                displayTeamsManagement();
-            }, 100);
-        } else if (pageId === 'mentor-panel') {
-            setTimeout(() => {
-                initializeMentorPanel();
-            }, 100);
-        }
-    } else {
-        console.error(`Page with ID "${pageId}" not found`);
-        const welcomePage = document.getElementById('welcome');
-        if (welcomePage) {
-            welcomePage.classList.add('active');
-            setTimeout(() => {
-                initializeUltimatePageAnimation();
-            }, 100);
-        }
-    }
-}
-
-
 function hideError(elementId) {
     const errorElement = document.getElementById(elementId);
     if (errorElement) {
@@ -2945,9 +2293,8 @@ async function handleAdminLogin(event) {
 
 function logout() {
     isLoggedIn = false;
-    showPage('welcome'); 
+    showPage('welcome-page');
 }
-
 
 // ====== DISPLAY FUNCTIONS ======
 async function displayTeams() {
@@ -3373,51 +2720,53 @@ function setupCharacterCounters() {
 
 // ====== INITIALIZATION ======
 // Enhanced app initialization with loading screen
+// Enhanced app initialization with loading screen
 async function initializeAppWithLoading() {
-    console.log('DOM loaded - starting app initialization');
-    
-    // Disable VFX during loading
-    disableVFX();
+    console.log('DOM loaded');
     
     // Show loading screen immediately
     initializeLoadingScreen();
     
     try {
-        // ✅ NEW: Set maximum loading time of 15 seconds
-        const loadingTimeout = setTimeout(() => {
-            console.log('Loading timeout reached - forcing completion');
-            forceCompleteLoading();
-        }, 15000);
-        
-        // Check backend health with reduced timeout
+        // Check if backend is healthy first
         const backendHealthy = await checkBackendHealth();
         
         if (backendHealthy) {
+            // Backend is responsive, load data
             await loadDataFromBackend();
         } else {
-            // Use fallback data
-            loadFallbackData();
+            // Backend might be sleeping, wait and retry
+            updateLoadingProgress(50, 'Waking up server, please be patient...');
+            
+            // Retry every 3 seconds until backend responds
+            const retryInterval = setInterval(async () => {
+                const health = await checkBackendHealth();
+                if (health) {
+                    clearInterval(retryInterval);
+                    await loadDataFromBackend();
+                }
+            }, 3000);
+            
+            // Set maximum wait time of 60 seconds
             setTimeout(() => {
-                hideLoadingScreen();
-            }, 1000);
+                clearInterval(retryInterval);
+                if (isBackendLoading) {
+                    updateStatusItem('status-backend', 'error');
+                    updateStatusItem('status-data', 'error');
+                    updateLoadingProgress(0, 'Connection timeout. Please refresh the page.');
+                }
+            }, 60000);
         }
         
-        // Clear the timeout if loading completed normally
-        clearTimeout(loadingTimeout);
-        
-        // Initialize app components
+        // Initialize app components after data is loaded - FIXED
         await initializeAppComponents();
         
     } catch (error) {
         console.error('App initialization failed:', error);
-        console.log('Using emergency fallback...');
-        
-        // Emergency fallback
-        forceCompleteLoading();
+        updateStatusItem('status-data', 'error');
+        updateLoadingProgress(0, 'Initialization failed. Please refresh the page.');
     }
 }
-
-
 
 
 // Initialize app components (called after data loading)
