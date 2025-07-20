@@ -11,6 +11,36 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Loading Screen for Backend Connection -->
+<div id="backend-loading-screen" class="backend-loading-overlay">
+    <div class="backend-loading-container">
+        <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+        </div>
+        <h2 class="loading-title">Connecting to Database</h2>
+        <p class="loading-message">Please hold on while we establish connection with our servers...</p>
+        <div class="loading-progress">
+            <div class="progress-bar-loading">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <span class="progress-text" id="progress-text">Initializing...</span>
+        </div>
+        <div class="loading-status" id="loading-status">
+            <div class="status-item" id="status-frontend">
+                <span class="status-icon">⏳</span> Loading frontend...
+            </div>
+            <div class="status-item" id="status-backend">
+                <span class="status-icon">⏳</span> Connecting to backend...
+            </div>
+            <div class="status-item" id="status-data">
+                <span class="status-icon">⏳</span> Loading application data...
+            </div>
+        </div>
+    </div>
+</div>
+
     <div class="container" id="app">
         <!-- Welcome Page -->
         <div id="welcome-page" class="page active">
