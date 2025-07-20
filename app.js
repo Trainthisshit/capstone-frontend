@@ -1301,25 +1301,59 @@ async function getRegisteredStudents() {
 
 // ====== UTILITY FUNCTIONS ======
 function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
+    console.log('Navigating to page:', pageId);
     
-    // Handle specific page initialization
-    if (pageId === 'view-teams') {
-        setTimeout(() => {
-            displayTeams();
-            displayRemainingStudents();
-        }, 100);
-    } else if (pageId === 'team-management') {
-        setTimeout(() => {
-            displayTeamsManagement();
-        }, 100);
-    } else if (pageId === 'mentor-panel') {
-        setTimeout(() => {
-            initializeMentorPanel();
-        }, 100);
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
+    
+    // Find and show target page
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) {
+        targetPage.classList.add('active');
+        
+        // Special handling for welcome page with VFX
+        if (pageId === 'welcome') {
+            console.log('Loading welcome page with VFX...');
+            
+            // Reset VFX state
+            vfxInitialized = false;
+            
+            // Initialize VFX with proper timing
+            setTimeout(() => {
+                initializeAllVFX();
+            }, 200);
+        }
+        
+        // Handle other page initializations...
+        if (pageId === 'view-teams') {
+            setTimeout(() => {
+                displayTeams();
+                displayRemainingStudents();
+            }, 100);
+        } else if (pageId === 'team-management') {
+            setTimeout(() => {
+                displayTeamsManagement();
+            }, 100);
+        } else if (pageId === 'mentor-panel') {
+            setTimeout(() => {
+                initializeMentorPanel();
+            }, 100);
+        }
+    } else {
+        console.error(`Page with ID "${pageId}" not found`);
+        // Fallback to welcome
+        const welcomePage = document.getElementById('welcome');
+        if (welcomePage) {
+            welcomePage.classList.add('active');
+            setTimeout(() => {
+                initializeAllVFX();
+            }, 200);
+        }
     }
 }
+
 function initializeMentorPanel() {
     currentLoggedMentor = null;
     const mentorDashboard = document.getElementById('mentor-dashboard');
@@ -1721,13 +1755,16 @@ function initializeProfessionalVFX() {
     if (vfxInitialized) return;
     vfxInitialized = true;
     
+    console.log('Initializing Professional VFX...');
+    
     setTimeout(() => {
-        initializeLetterAnimation(); // ADD this line
+        initializeLetterAnimation(); // This was missing!
         createCodeParticles();
         createNeuralNetwork();
         createMatrixRain();
     }, 100);
 }
+
 
 function initializeLetterAnimation() {
     const titleElement = document.querySelector('.welcome-title .cs-engineering-glitch');
