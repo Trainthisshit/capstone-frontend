@@ -7,6 +7,7 @@ let appData = {
 let isFinalListHODLoggedIn = false;
 let currentMentorEditUser = null;
 let currentFinalizeTeam = null;
+let vfxInitialized = false;
 let newIdeaBuffer = [];
 let currentEditTeam = null;
 let isHODLoggedIn = false;
@@ -1652,6 +1653,179 @@ function cancelAddMember() {
     document.getElementById('new-member-dept').value = '';
     document.getElementById('new-member-student').value = '';
 }
+
+// ====== PROFESSIONAL VFX INITIALIZATION ====== 
+
+function initializeProfessionalVFX() {
+  if (vfxInitialized) return;
+  vfxInitialized = true;
+  
+  createCodeParticles();
+  createNeuralNetwork();
+  createMatrixRain();
+  initializeGlitchEffect();
+}
+
+function createCodeParticles() {
+  const container = document.getElementById('codeParticles');
+  if (!container) return;
+  
+  const codeSnippets = [
+    'class Capstone {',
+    'function register() {',
+    'const team = [];',
+    'let mentor = null;',
+    'if (project.approved)',
+    'return success;',
+    '// CS Engineering',
+    'async await fetch',
+    'console.log("VFX");',
+    'export default App',
+    'import React from',
+    'useState([])',
+    '<Team />',
+    '.then(response)',
+    'Object.keys(data)',
+    'Math.random()',
+    'setTimeout(() => {',
+    'document.query',
+    'addEventListener',
+    'preventDefault()'
+  ];
+  
+  setInterval(() => {
+    if (document.getElementById('welcome').classList.contains('active')) {
+      const particle = document.createElement('div');
+      particle.className = 'code-particle';
+      particle.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 2 + 's';
+      container.appendChild(particle);
+      
+      setTimeout(() => {
+        if (particle.parentNode) {
+          particle.parentNode.removeChild(particle);
+        }
+      }, 15000);
+    }
+  }, 2000);
+}
+
+function createNeuralNetwork() {
+  const container = document.getElementById('neuralNetwork');
+  if (!container) return;
+  
+  // Create neural nodes
+  const nodeCount = 15;
+  const nodes = [];
+  
+  for (let i = 0; i < nodeCount; i++) {
+    const node = document.createElement('div');
+    node.className = 'neural-node';
+    node.style.left = Math.random() * 100 + '%';
+    node.style.top = Math.random() * 100 + '%';
+    node.style.animationDelay = Math.random() * 4 + 's';
+    container.appendChild(node);
+    nodes.push({
+      element: node,
+      x: parseFloat(node.style.left),
+      y: parseFloat(node.style.top)
+    });
+  }
+  
+  // Create connections between nearby nodes
+  nodes.forEach((nodeA, i) => {
+    nodes.slice(i + 1).forEach(nodeB => {
+      const distance = Math.sqrt(
+        Math.pow(nodeA.x - nodeB.x, 2) + Math.pow(nodeA.y - nodeB.y, 2)
+      );
+      
+      if (distance < 30) { // Only connect nearby nodes
+        const connection = document.createElement('div');
+        connection.className = 'neural-connection';
+        
+        const angle = Math.atan2(nodeB.y - nodeA.y, nodeB.x - nodeA.x);
+        const length = distance;
+        
+        connection.style.width = length + '%';
+        connection.style.left = nodeA.x + '%';
+        connection.style.top = nodeA.y + '%';
+        connection.style.transform = `rotate(${angle}rad)`;
+        connection.style.animationDelay = Math.random() * 6 + 's';
+        
+        container.appendChild(connection);
+      }
+    });
+  });
+}
+
+function createMatrixRain() {
+  const container = document.getElementById('matrixRain');
+  if (!container) return;
+  
+  const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz<>{}[]()';
+  const columnCount = Math.floor(window.innerWidth / 20);
+  
+  for (let i = 0; i < columnCount; i++) {
+    setTimeout(() => {
+      if (document.getElementById('welcome').classList.contains('active')) {
+        const column = document.createElement('div');
+        column.className = 'matrix-column';
+        column.style.left = (i * 20) + 'px';
+        column.style.animationDelay = Math.random() * 5 + 's';
+        column.style.animationDuration = (8 + Math.random() * 4) + 's';
+        
+        let columnText = '';
+        for (let j = 0; j < 20; j++) {
+          columnText += characters.charAt(Math.floor(Math.random() * characters.length)) + '\n';
+        }
+        column.textContent = columnText;
+        
+        container.appendChild(column);
+        
+        setTimeout(() => {
+          if (column.parentNode) {
+            column.parentNode.removeChild(column);
+          }
+        }, 12000);
+      }
+    }, i * 100);
+  }
+  
+  // Repeat the effect
+  setTimeout(createMatrixRain, 15000);
+}
+
+function initializeGlitchEffect() {
+  const glitchElement = document.querySelector('.cs-engineering-glitch');
+  if (!glitchElement) return;
+  
+  setInterval(() => {
+    if (document.getElementById('welcome').classList.contains('active') && Math.random() < 0.1) {
+      glitchElement.style.animation = 'none';
+      setTimeout(() => {
+        glitchElement.style.animation = 'glitch 0.3s';
+      }, 10);
+    }
+  }, 3000);
+}
+
+// Update your existing showPage function to initialize VFX
+const originalShowPage = showPage;
+showPage = function(pageId) {
+  originalShowPage(pageId);
+  
+  if (pageId === 'welcome') {
+    setTimeout(initializeProfessionalVFX, 100);
+  }
+};
+
+// Initialize VFX when the page loads if welcome is active
+document.addEventListener('DOMContentLoaded', function() {
+  if (document.getElementById('welcome').classList.contains('active')) {
+    setTimeout(initializeProfessionalVFX, 500);
+  }
+});
 
 // Confirm add member
 async function confirmAddMember() {
