@@ -2602,3 +2602,151 @@ textarea.form-control {
     opacity: 0.03 !important;
     z-index: -5 !important;
 }
+
+/* ========== ULTIMATE PAGE-WIDE ANIMATION SYSTEM ========== */
+
+/* Base container for all animated elements */
+.welcome-container {
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+}
+
+/* Enhanced Letter Animation with More Dramatic Effects */
+.letter-animate {
+    display: inline-block;
+    color: inherit !important;
+    opacity: 0;
+    transform: translate(var(--start-x, 0), var(--start-y, 0)) rotate(var(--start-rotate, 0deg)) scale(var(--start-scale, 0.1));
+    animation: ultimateLetterSettle 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    animation-delay: var(--delay, 0s);
+}
+
+@keyframes ultimateLetterSettle {
+    0% {
+        opacity: 0;
+        transform: translate(var(--start-x, 0), var(--start-y, 0)) rotate(var(--start-rotate, 0deg)) scale(var(--start-scale, 0.1));
+    }
+    40% {
+        opacity: 0.6;
+        transform: translate(calc(var(--start-x, 0) * 0.4), calc(var(--start-y, 0) * 0.4)) rotate(calc(var(--start-rotate, 0deg) * 0.4)) scale(1.3);
+    }
+    70% {
+        opacity: 0.9;
+        transform: translate(calc(var(--start-x, 0) * 0.1), calc(var(--start-y, 0) * 0.1)) rotate(calc(var(--start-rotate, 0deg) * 0.1)) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+}
+
+/* Button Entrance Animation */
+.btn-animate {
+    opacity: 0;
+    transform: translate(var(--btn-start-x, 0), var(--btn-start-y, 0)) rotate(var(--btn-rotate, 0deg)) scale(var(--btn-scale, 0.3));
+    animation: buttonSettle 1.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    animation-delay: var(--btn-delay, 0s);
+}
+
+@keyframes buttonSettle {
+    0% {
+        opacity: 0;
+        transform: translate(var(--btn-start-x, 0), var(--btn-start-y, 0)) rotate(var(--btn-rotate, 0deg)) scale(var(--btn-scale, 0.3));
+    }
+    50% {
+        opacity: 0.7;
+        transform: translate(calc(var(--btn-start-x, 0) * 0.3), calc(var(--btn-start-y, 0) * 0.3)) rotate(calc(var(--btn-rotate, 0deg) * 0.3)) scale(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+}
+
+/* Text Block Animation (for paragraphs) */
+.text-animate {
+    opacity: 0;
+    transform: translate(var(--text-start-x, 0), var(--text-start-y, 0)) rotate(var(--text-rotate, 0deg)) scale(var(--text-scale, 0.5));
+    animation: textSettle 1.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    animation-delay: var(--text-delay, 0s);
+}
+
+@keyframes textSettle {
+    0% {
+        opacity: 0;
+        transform: translate(var(--text-start-x, 0), var(--text-start-y, 0)) rotate(var(--text-rotate, 0deg)) scale(var(--text-scale, 0.5));
+    }
+    60% {
+        opacity: 0.8;
+        transform: translate(calc(var(--text-start-x, 0) * 0.2), calc(var(--text-start-y, 0) * 0.2)) rotate(calc(var(--text-rotate, 0deg) * 0.2)) scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+}
+
+/* Icon/Emoji Animation */
+.icon-animate {
+    display: inline-block;
+    opacity: 0;
+    transform: translate(var(--icon-start-x, 0), var(--icon-start-y, 0)) rotate(var(--icon-rotate, 0deg)) scale(var(--icon-scale, 0.2));
+    animation: iconSettle 2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    animation-delay: var(--icon-delay, 0s);
+}
+
+@keyframes iconSettle {
+    0% {
+        opacity: 0;
+        transform: translate(var(--icon-start-x, 0), var(--icon-start-y, 0)) rotate(var(--icon-rotate, 0deg)) scale(var(--icon-scale, 0.2));
+    }
+    30% {
+        opacity: 0.4;
+        transform: translate(calc(var(--icon-start-x, 0) * 0.7), calc(var(--icon-start-y, 0) * 0.7)) rotate(calc(var(--icon-rotate, 0deg) * 0.7)) scale(1.5);
+    }
+    70% {
+        opacity: 0.8;
+        transform: translate(calc(var(--icon-start-x, 0) * 0.2), calc(var(--icon-start-y, 0) * 0.2)) rotate(calc(var(--icon-rotate, 0deg) * 0.2)) scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg) scale(1);
+    }
+}
+
+/* Container Animation for Welcome Options */
+.welcome-options {
+    opacity: 0;
+    animation: containerFadeIn 1s ease-out forwards;
+    animation-delay: 3s; /* After most elements settle */
+}
+
+@keyframes containerFadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Enhanced button hover effects */
+.btn-animate:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Ensure all text remains visible */
+.welcome-title *, 
+.welcome-container h2,
+.welcome-container p,
+.btn-animate {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
+    background-clip: unset !important;
+    -webkit-background-clip: unset !important;
+}
