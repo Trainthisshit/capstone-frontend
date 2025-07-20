@@ -245,28 +245,6 @@ async function populateMentorDropdowns() {
 }
 
 
-// Add showPage function if missing
-function showPage(pageId) {
-    // Hide all pages
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
-    
-    // Show target page
-    const targetPage = document.getElementById(pageId);
-    if (targetPage) {
-        targetPage.classList.add('active');
-        
-        // Initialize VFX only for welcome page
-        if (pageId === 'welcome') {
-            vfxInitialized = false; // CHANGE: Reset this to allow re-animation
-            setTimeout(initializeProfessionalVFX, 300);
-        }
-    } else {
-        console.error(`Page with ID "${pageId}" not found`);
-    }
-}
-
 async function displayTeams() {
     try {
         console.log('Fetching teams for display...');
@@ -1812,17 +1790,54 @@ function createMatrixRain() {
   setTimeout(createMatrixRain, 15000);
 }
 
+// REPLACE BOTH showPage functions with this SINGLE version
+function showPage(pageId) {
+    console.log('Navigating to page:', pageId); // Debug log
+    
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
+    
+    // Find and show target page
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) {
+        targetPage.classList.add('active');
+        
+        // Initialize VFX only for welcome page
+        if (pageId === 'welcome') {
+            vfxInitialized = false; // Reset to allow re-animation
+            setTimeout(initializeProfessionalVFX, 300);
+        }
+        
+        // Handle specific page initialization
+        if (pageId === 'view-teams') {
+            setTimeout(() => {
+                displayTeams();
+                displayRemainingStudents();
+            }, 100);
+        } else if (pageId === 'team-management') {
+            setTimeout(() => {
+                displayTeamsManagement();
+            }, 100);
+        } else if (pageId === 'mentor-panel') {
+            setTimeout(() => {
+                initializeMentorPanel();
+            }, 100);
+        }
+    } else {
+        console.error(`Page with ID "${pageId}" not found`);
+        // Fallback to welcome page
+        const welcomePage = document.getElementById('welcome');
+        if (welcomePage) {
+            welcomePage.classList.add('active');
+            vfxInitialized = false;
+            setTimeout(initializeProfessionalVFX, 300);
+        }
+    }
+}
 
 
-// Update your existing showPage function to initialize VFX
-const originalShowPage = showPage;
-showPage = function(pageId) {
-  originalShowPage(pageId);
-  
-  if (pageId === 'welcome') {
-    setTimeout(initializeProfessionalVFX, 100);
-  }
-};
 
 // Initialize VFX when the page loads if welcome is active
 document.addEventListener('DOMContentLoaded', function() {
@@ -2471,8 +2486,9 @@ async function handleAdminLogin(event) {
 
 function logout() {
     isLoggedIn = false;
-    showPage('welcome-page');
+    showPage('welcome'); 
 }
+
 
 // ====== DISPLAY FUNCTIONS ======
 async function displayTeams() {
