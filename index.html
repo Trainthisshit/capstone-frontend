@@ -43,21 +43,42 @@
 
     <div class="container" id="app">
         <!-- Welcome Page -->
-        <div id="welcome-page" class="page active">
-            <div class="welcome-container">
-                <h1>Welcome to Polytechnic Capstone Portal</h1>
-                <h2>Computer science and engineering Department</h2>
-                <p>Form your capstone project teams and select mentors for an amazing final year experience</p>
-                <div class="welcome-options">
-                    <button class="btn btn--primary btn--lg" onclick="showPage('team-registration')">
-                        Team Registration
-                    </button>
-                    <button class="btn btn--secondary btn--lg" onclick="showPage('admin-login')">
-                        Administrator
-                    </button>
-                </div>
-            </div>
-        </div>
+        <div id="welcome" class="page active">
+  <div class="welcome-container">
+    <!-- Code Particles Background -->
+    <div class="code-particles" id="codeParticles"></div>
+    
+    <!-- Neural Network Visualization -->
+    <div class="neural-network" id="neuralNetwork"></div>
+    
+    <!-- Matrix Rain Effect -->
+    <div class="matrix-rain" id="matrixRain"></div>
+    
+    <h1 class="welcome-title" data-text="Capstone Project Registration">
+      <span class="cs-engineering-glitch" data-text="Capstone Project Registration">
+        Capstone Project Registration
+      </span>
+    </h1>
+    
+    <h2>
+      <span class="capstone-icon">🎓</span>
+      School of Computer Science & Engineering
+      <span class="capstone-icon">💻</span>
+    </h2>
+    
+    <p>Form your capstone project teams, select mentors, and embark on your final year journey with cutting-edge technology and innovation.</p>
+    
+    <div class="welcome-options">
+      <button class="btn btn--primary btn--lg" onclick="showPage('team-details')">
+        Create Team
+      </button>
+      <button class="btn btn--secondary btn--lg" onclick="showPage('admin-dashboard')">
+        Admin Panel
+      </button>
+    </div>
+  </div>
+</div>
+
 
         <!-- Team Registration - Step 1: Team Details -->
         <div id="team-registration" class="page">
@@ -389,6 +410,7 @@
                         <button class="btn btn--secondary" onclick="showPage('admin-dashboard')">Back to Dashboard</button>
                     </div>
                 </div>
+            
                 
                 <div class="team-management-section">
                     <h3>Registered Teams</h3>
