@@ -567,6 +567,101 @@ async function handleTeamEditForm(event) {
     }
 }
 
+// ========== PROFESSIONAL LETTER ANIMATION SYSTEM ========== 
+
+function initializeLetterAnimation() {
+    console.log('Starting letter animation...');
+    
+    const titleElement = document.querySelector('.welcome-title .cs-engineering-glitch');
+    if (!titleElement) {
+        console.log('Title element not found');
+        return;
+    }
+    
+    const text = titleElement.textContent;
+    console.log('Animating text:', text);
+    
+    titleElement.innerHTML = '';
+    
+    Array.from(text).forEach((char, index) => {
+        const span = document.createElement('span');
+        span.textContent = char === ' ' ? '\u00A0' : char;
+        span.className = 'letter-animate';
+        
+        // Random starting positions - wider range for better effect
+        const randomX = (Math.random() - 0.5) * 1000;
+        const randomY = (Math.random() - 0.5) * 800;
+        const randomRotate = (Math.random() - 0.5) * 360;
+        const delay = index * 0.08;
+        
+        span.style.setProperty('--start-x', `${randomX}px`);
+        span.style.setProperty('--start-y', `${randomY}px`);
+        span.style.setProperty('--start-rotate', `${randomRotate}deg`);
+        span.style.setProperty('--delay', `${delay}s`);
+        
+        titleElement.appendChild(span);
+    });
+    
+    console.log('Letter animation setup complete');
+}
+
+function enhancedCreateCodeParticles() {
+    const container = document.getElementById('codeParticles');
+    if (!container) return;
+    
+    const codeSnippets = [
+        'class Team {', 'function register()', 'const mentor =', 'let project;',
+        'if (team.ready)', '=> success', 'async/await', 'import React',
+        'console.log()', 'return data;', 'try { }', 'catch (err)'
+    ];
+    
+    setInterval(() => {
+        if (document.getElementById('welcome')?.classList.contains('active')) {
+            const particle = document.createElement('div');
+            particle.className = 'code-particle';
+            particle.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 3 + 's';
+            particle.style.animationDuration = (20 + Math.random() * 10) + 's';
+            particle.style.fontSize = '10px';
+            particle.style.color = 'rgba(59, 130, 246, 0.2)';
+            container.appendChild(particle);
+            
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                }
+            }, 30000);
+        }
+    }, 3000);
+}
+
+function initializeAllVFX() {
+    console.log('Initializing all VFX systems...');
+    
+    // Clear any existing VFX
+    vfxInitialized = false;
+    
+    setTimeout(() => {
+        initializeLetterAnimation();
+    }, 500);
+    
+    setTimeout(() => {
+        enhancedCreateCodeParticles();
+    }, 1000);
+    
+    setTimeout(() => {
+        if (typeof createNeuralNetwork === 'function') createNeuralNetwork();
+    }, 1500);
+    
+    setTimeout(() => {
+        if (typeof createMatrixRain === 'function') createMatrixRain();
+    }, 2000);
+    
+    vfxInitialized = true;
+}
+
+
 // Add this function for debugging
 async function debugSupabase() {
     console.log('Testing Supabase connection...');
