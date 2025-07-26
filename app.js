@@ -1181,7 +1181,6 @@ function populateSelects() {
 
 
 
-
 async function saveTeam(team) {
     try {
         const response = await fetch(`${API_BASE_URL}/api/teams`, {
@@ -1191,17 +1190,71 @@ async function saveTeam(team) {
             },
             body: JSON.stringify(team)
         });
-        
-        if (!response.ok) throw new Error('Failed to save team');
-        
+
+        // Don't throw yet, as backend may return status 200 for analysis response
         const result = await response.json();
-        return result.success;
+
+        if (result.analysis) {
+            // Some ideas were similar, show warning and maybe resubmit
+            showIdeaSimilarityWarning(
+                result.similar,
+                team,
+                submitTeamWithForceRegister
+            );
+            return false; // don't treat as "success"
+        }
+
+        if (result.success) {
+            showPage('success');
+            return true;
+        }
+
+        // Otherwise, show error
+        alert(result.error || 'Registration failed.');
+        return false;
+
     } catch (error) {
         console.error('Error saving team:', error);
         alert('Error saving team: ' + error.message);
         return false;
     }
 }
+
+// ===== Helper functions for similarity warnings (add these somewhere in your JS) =====
+
+function showIdeaSimilarityWarning(similarArray, teamData, onSubmitAnyway) {
+    let msg = "⚠️ One or more of your project ideas is similar to an already registered idea:\n";
+    (teamData.project_ideas || []).forEach((idea, idx) => {
+        msg += `\n${idx+1}) "${idea}" ${similarArray[idx] ? "⚠️ Similar" : "✅ Unique"}`;
+    });
+    msg += "\n\nWould you like to Edit ideas, or Register Anyway?";
+    if (confirm(msg + "\n\nPress OK to Register Anyway, Cancel to Edit ideas.")) {
+        // User wants to register anyway
+        onSubmitAnyway(teamData);
+    } else {
+        // User wants to edit ideas: go back to idea input page
+        showPage('mentor-selection'); // <--- change if your idea input page has a different name
+    }
+}
+
+async function submitTeamWithForceRegister(teamData) {
+    // Add forceRegisterAnyway flag
+    teamData.forceRegisterAnyway = true;
+    const response = await fetch(`${API_BASE_URL}/api/teams`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(teamData)
+    });
+    const result = await response.json();
+    if (result.success) {
+        showPage('success');
+        return true;
+    } else {
+        alert(result.error || 'Registration failed.');
+        return false;
+    }
+}
+
 
 async function deleteTeam(teamId) {
     if (confirm('Are you sure you want to delete this team? This action cannot be undone.')) {
