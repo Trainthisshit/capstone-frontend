@@ -1205,9 +1205,10 @@ async function saveTeam(team) {
         }
 
         if (result.success) {
-            showPage('success');
-            return true;
-        }
+    showPage('success-page');
+    return true;
+}
+
 
         // Otherwise, show error
         alert(result.error || 'Registration failed.');
@@ -1247,9 +1248,10 @@ async function submitTeamWithForceRegister(teamData) {
     });
     const result = await response.json();
     if (result.success) {
-        showPage('success');
-        return true;
-    } else {
+    showPage('success-page');
+    return true;
+}
+ else {
         alert(result.error || 'Registration failed.');
         return false;
     }
